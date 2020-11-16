@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- to relative layout exei 100dp default width/height kathos sto sceneform 250dp adistixi se 1 metro sto pragmatiko kosmo ara 100dp adistixi se 40 ekatosta-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp" android:layout_height="100dp">
+
+    <androidx.viewpager.widget.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/viewPager"/>
+
+</RelativeLayout>
