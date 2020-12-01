@@ -1,25 +1,17 @@
 package com.lefalexiou.geoar_app;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.RadioButton;
 
-import com.google.ar.core.Anchor;
-import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     private ArFragment arFragment;
+    private int itemSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,72 +19,51 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+        RadioButton viewButton = findViewById(R.id.radio_view);
 
+        viewButton.setChecked(true);
+        itemSelector = 0;
+
+        assert arFragment != null;
         arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
-            createVIewRenderable(hitResult.createAnchor());
+            switch (itemSelector) {
+                case 0:
+                    ViewObject viewObject = new ViewObject(arFragment, this, R.layout.placeholderview);
+                    viewObject.createViewRenderable(hitResult.createAnchor());
+                    break;
+                case 1:
+//                    VideoObject videoObject = new VideoObject(arFragment, this, hitResult.createAnchor());
+                    ViewObject videoObject = new ViewObject(arFragment, this, R.layout.video_placeholder);
+                    break;
+                case 2:
+                    ModelObject modelObject = new ModelObject(arFragment, this);
+                    modelObject.createViewRenderable(hitResult.createAnchor());
+                    break;
+            }
         }));
     }
 
-    private void createVIewRenderable(Anchor anchor) {
-        ViewRenderable.builder().setView(this, R.layout.placeholderview).build().thenAccept(viewRenderable -> {
-            addToScene(viewRenderable,anchor);
-        });
-    }
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
 
-    private void addToScene(ViewRenderable viewRenderable, Anchor anchor) {
-        AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setRenderable(viewRenderable);
-        arFragment.getArSceneView().getScene().addChild(anchorNode);
-
-        View view = viewRenderable.getView();
-
-        ViewPager viewPager = view.findViewById(R.id.viewPager);
-
-        List<Integer> images = new ArrayList<>();
-        images.add(R.drawable.ic_launcher_background);
-        images.add(R.drawable.ic_launcher_foreground);
-        images.add(R.drawable.ic_launcher_background);
-        images.add(R.drawable.ic_launcher_foreground);
-        images.add(R.drawable.ic_launcher_background);
-        images.add(R.drawable.ic_launcher_foreground);
-
-        Adapter adapter = new Adapter(images);
-        viewPager.setAdapter(adapter);
-    }
-
-    private class Adapter extends PagerAdapter{
-        List<Integer> images;
-
-        Adapter(List<Integer> images){
-            this.images = images;
-        }
-
-        @NonNull
-        @Override
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            View view = getLayoutInflater().inflate(R.layout.item,container,false);
-
-            ImageView imageView = view.findViewById(R.id.imageView);
-            imageView.setImageResource(images.get(position));
-
-            container.addView(view);
-
-            return view;
-        }
-
-        @Override
-        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            container.removeView((ImageView)object);
-        }
-
-        @Override
-        public int getCount() {
-            return images.size();
-        }
-
-        @Override
-        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-            return view == object;
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.radio_view:
+                if (checked)
+                    // View selected
+                    itemSelector = 0;
+                break;
+            case R.id.t2:
+                if (checked)
+                    // t2 selected
+                    itemSelector = 1;
+                break;
+            case R.id.model:
+                if (checked)
+                    // 3d transformable model selected
+                    itemSelector = 2;
+                break;
         }
     }
 }
