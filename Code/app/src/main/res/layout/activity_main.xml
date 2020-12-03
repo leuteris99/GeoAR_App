@@ -30,11 +30,11 @@
             android:text="View" />
 
         <RadioButton
-            android:id="@+id/t2"
+            android:id="@+id/video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="t2" />
+            android:text="video model" />
 
         <RadioButton
             android:id="@+id/model"
@@ -42,6 +42,13 @@
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="3D model" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/animated_model"
+            android:text="animated model"
+            android:onClick="onRadioButtonClicked"/>
     </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

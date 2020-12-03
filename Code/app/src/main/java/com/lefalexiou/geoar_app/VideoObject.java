@@ -15,6 +15,7 @@ class VideoObject {
     ArFragment arFragment;
     Context context;
     private ModelRenderable videoRenderable;
+    private float HEIGHT = 1.25f;
 
     public VideoObject(ArFragment arFragment, Context context, Anchor anchor) {
         this.arFragment = arFragment;
@@ -47,7 +48,6 @@ class VideoObject {
 
         float width = mediaPlayer.getVideoWidth();
         float height = mediaPlayer.getVideoHeight();
-        float HEIGHT = 1.25f;
 
         anchorNode.setLocalScale(new Vector3(HEIGHT * (width / height), HEIGHT, 1.0f));
 

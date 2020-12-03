@@ -32,11 +32,11 @@ public class MainActivity extends AppCompatActivity {
                     viewObject.createViewRenderable(hitResult.createAnchor());
                     break;
                 case 1:
-//                    VideoObject videoObject = new VideoObject(arFragment, this, hitResult.createAnchor());
-                    ViewObject videoObject = new ViewObject(arFragment, this, R.layout.video_placeholder);
+                    VideoObject videoObject = new VideoObject(arFragment, this, hitResult.createAnchor());
                     break;
                 case 2:
-                    ModelObject modelObject = new ModelObject(arFragment, this);
+                case 3:
+                    ModelObject modelObject = new ModelObject(arFragment, this, itemSelector);
                     modelObject.createViewRenderable(hitResult.createAnchor());
                     break;
             }
@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
                     // View selected
                     itemSelector = 0;
                 break;
-            case R.id.t2:
+            case R.id.video:
                 if (checked)
-                    // t2 selected
+                    // Video model selected
                     itemSelector = 1;
                 break;
             case R.id.model:
@@ -64,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
                     // 3d transformable model selected
                     itemSelector = 2;
                 break;
+            case R.id.animated_model:
+                if (checked)
+                    // animated model selected
+                    itemSelector = 3;
         }
     }
 }
