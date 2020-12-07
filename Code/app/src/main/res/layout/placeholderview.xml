@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?><!-- to relative layout exei 100dp default width/height kathos sto sceneform 250dp adistixi se 1 metro sto pragmatiko kosmo ara 125dp adistixi se miso metro-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="125dp"
-    android:layout_height="125dp">
+    android:layout_height="125dp"
+    android:background="@color/background">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -32,14 +33,16 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/textEx"
             android:text="This is a question"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textColor="@color/fonts"/>
 
         <TextView
             android:id="@+id/textEx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This is an example of a simple view screen"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="@color/fonts"/>
 
     </RelativeLayout>
 </ScrollView>

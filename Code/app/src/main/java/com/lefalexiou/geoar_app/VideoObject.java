@@ -15,7 +15,7 @@ class VideoObject {
     ArFragment arFragment;
     Context context;
     private ModelRenderable videoRenderable;
-    private float HEIGHT = 1.25f;
+    private float HEIGHT = 1.0f;
 
     public VideoObject(ArFragment arFragment, Context context, Anchor anchor) {
         this.arFragment = arFragment;
@@ -23,7 +23,7 @@ class VideoObject {
 
         ExternalTexture texture = new ExternalTexture();
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.crab_rave);
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.videoplayback);
         mediaPlayer.setSurface(texture.getSurface());
         mediaPlayer.setLooping(true);
 
