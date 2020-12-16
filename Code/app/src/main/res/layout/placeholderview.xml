@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?><!-- to relative layout exei 100dp default width/height kathos sto sceneform 250dp adistixi se 1 metro sto pragmatiko kosmo ara 125dp adistixi se miso metro-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="125dp"
-    android:layout_height="125dp"
+    android:layout_width="170dp"
+    android:layout_height="200dp"
     android:background="@color/background">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
+
+        <WebView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/submit_button"
+            android:id="@+id/webview"/>
+
+        <Button
+            android:id="@+id/submit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:layout_below="@id/radio_group"
+            android:onClick="onSubmitClick"/>
 
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/question"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/radio_group">
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="First option"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:id="@+id/first_choice"
+                android:onClick="onQuestionChoiceClick"/>
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Second option"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:id="@+id/second_choice"
+                android:onClick="onQuestionChoiceClick"/>
         </RadioGroup>
 
         <TextView
@@ -42,7 +61,14 @@
             android:layout_height="wrap_content"
             android:text="This is an example of a simple view screen"
             android:textSize="14sp"
-            android:textColor="@color/fonts"/>
+            android:textColor="@color/fonts"
+            android:layout_below="@id/logo"/>
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:src="@drawable/ionian_university"
+            android:id="@+id/logo"
+            android:contentDescription="Ionian University's logo" />
     </RelativeLayout>
 </ScrollView>

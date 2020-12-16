@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
 
 import com.google.ar.sceneform.ux.ArFragment;
@@ -12,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ArFragment arFragment;
     private int itemSelector;
+    private String answer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,28 @@ public class MainActivity extends AppCompatActivity {
                 if (checked)
                     // animated model selected
                     itemSelector = 3;
+        }
+    }
+
+    public void onSubmitClick(View view){
+        Button b = (Button) view;
+        b.setText(answer);
+    }
+
+    public void onQuestionChoiceClick(View view){
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.first_choice:
+                if (checked)
+                    answer = "you choose 1";
+                break;
+            case R.id.second_choice:
+                if (checked)
+                    answer = "second it is!";
+                break;
         }
     }
 }

@@ -3,7 +3,12 @@ package com.lefalexiou.geoar_app;
 import android.content.Context;
 
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.google.ar.core.Anchor;
@@ -35,7 +40,12 @@ class ViewObject {
         anchorNode.setRenderable(viewRenderable);
         arFragment.getArSceneView().getScene().addChild(anchorNode);
 
-//        View view = viewRenderable.getView();
+        View view = viewRenderable.getView();
+
+        WebView webView = (WebView) view.findViewById(R.id.webview);
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl("https://www.google.com");
+//        https://di.ionio.gr/en/
     }
 
     public void setVideoPlayer(int res, VideoView videoView, String packageName) {
