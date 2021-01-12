@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- to relative layout exei 100dp default width/height kathos sto sceneform 250dp adistixi se 1 metro sto pragmatiko kosmo ara 125dp adistixi se miso metro-->
+<?xml version="1.0" encoding="utf-8"?><!-- to relative layout exei 170dp default width kai 200dp height kathos sto sceneform 250dp adistixi se 1 metro sto pragmatiko kosmo-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="170dp"
     android:layout_height="200dp"

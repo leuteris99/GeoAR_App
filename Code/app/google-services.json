@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "689383081438",
+    "project_id": "geoarapp-97850",
+    "storage_bucket": "geoarapp-97850.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689383081438:android:2452d160311e4b73f4c94f",
+        "android_client_info": {
+          "package_name": "com.lefalexiou.geoar_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "689383081438-dvd0b83ufe5b0nqm95c4s4q7987dotha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOEIToxKW6bKbMrZguqVvrsbzvIgB-Ob8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "689383081438-dvd0b83ufe5b0nqm95c4s4q7987dotha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
