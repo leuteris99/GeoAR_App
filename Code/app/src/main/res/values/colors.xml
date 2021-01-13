@@ -5,4 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="background">#AAAAAA</color>
     <color name="fonts">#000000</color>
+
+    <color name="unselected_poly_line">#9E9E9E</color>
+    <color name="selected_poly_line">#B71C1C</color>
 </resources>

@@ -1,4 +1,4 @@
-package com.lefalexiou.geoar_app;
+package com.lefalexiou.geoar_app.models;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -10,8 +10,9 @@ import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.ExternalTexture;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.lefalexiou.geoar_app.R;
 
-class VideoObject {
+public class VideoObject {
     ArFragment arFragment;
     Context context;
     private ModelRenderable videoRenderable;

@@ -7,4 +7,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Fab">
+        <item name="backgroundTint">#fff</item>
+    </style>
+
 </resources>

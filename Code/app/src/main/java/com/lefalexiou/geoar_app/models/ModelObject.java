@@ -1,4 +1,4 @@
-package com.lefalexiou.geoar_app;
+package com.lefalexiou.geoar_app.models;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
@@ -13,6 +13,7 @@ import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.lefalexiou.geoar_app.R;
 
 public class ModelObject {
     private static final String TAG = "viewObject";

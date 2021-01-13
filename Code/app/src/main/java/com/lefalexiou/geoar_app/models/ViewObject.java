@@ -1,4 +1,4 @@
-package com.lefalexiou.geoar_app;
+package com.lefalexiou.geoar_app.models;
 
 import android.content.Context;
 
@@ -15,9 +15,10 @@ import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.lefalexiou.geoar_app.R;
 
 
-class ViewObject {
+public class ViewObject {
     private static final String TAG = "viewObject";
     ArFragment arFragment;
     Context context;
