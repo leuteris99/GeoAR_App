@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,8 +33,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -41,10 +48,16 @@ import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.PolylineData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import dagger.internal.ProviderOfLazy;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,9 +75,13 @@ public class MapFragment extends Fragment implements
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GeoApiContext mGeoApiContext = null;
     private LatLng mUserPosition;
-    private FloatingActionButton fab;
+    //    private FloatingActionButton fab; TODO: to remove
+    private Button nextButton;
+    private Button prevButton;
+    private int selectedPlace = -1;
     private List<Marker> markersList = new ArrayList<>();
     private ArrayList<PolylineData> mPolylinesData = new ArrayList<>();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public MapFragment() {
         // Required empty public constructor
@@ -87,7 +104,9 @@ public class MapFragment extends Fragment implements
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         initMap();
-        fab = (FloatingActionButton) v.findViewById(R.id.fab);
+//        fab = (FloatingActionButton) v.findViewById(R.id.fab); TODO: to remove
+        nextButton = (Button) v.findViewById(R.id.next_bt);
+        prevButton = (Button) v.findViewById(R.id.prev_bt);
         return v;
     }
 
@@ -176,15 +195,17 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    private void addMarker(LatLng latLng, String title) {
+    private void addMarkers(List<Place> places) {
         // TODO: Reset the markers. On live add this when you change all your markers.
         Log.d(TAG, "addMarker: add marker");
         resetMap();
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title(title);
-        Marker marker = mMap.addMarker(options);
-        markersList.add(marker);
+        for (Place place : places) {
+            MarkerOptions options = new MarkerOptions()
+                    .position(place.getLatLng())
+                    .title(place.getTitle());
+            Marker marker = mMap.addMarker(options);
+            markersList.add(marker);
+        }
     }
 
     private void calculateDirections(Marker marker) {
@@ -289,14 +310,10 @@ public class MapFragment extends Fragment implements
         //getting device position and displaying it on the map
         getDeviceLocation();
 
+        //TODO: remove that only for testing
+//        addData(new Place(new LatLng(37.9647036, 23.7312254), "Temple of Olympian Zeus", 15));
+
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             Log.d(TAG, "onMapReady: permission deny");
             return;
         }
@@ -304,11 +321,65 @@ public class MapFragment extends Fragment implements
         Log.d(TAG, "onMapReady: location enable");
 
         //TODO: Testing marker remove it on live
-        addMarker(new LatLng(37.971774741979004, 23.72580165163131), "Acropolis of Athens");
-        fab.setOnClickListener(new View.OnClickListener() {
+        db.collection("marker")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<Place> places = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                Map<String, Object> data = document.getData();
+                                Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
+                                LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
+                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"));
+                                Log.d(TAG, "onMap: place: " + place);
+
+                                places.add(place);
+                            }
+                            addMarkers(places);
+                        } else {
+                            Log.d(TAG, "onMap: fail");
+                        }
+                    }
+                });
+
+        /*fab.setOnClickListener(new View.OnClickListener() { TODO: to remove
             @Override
             public void onClick(View view) {
                 calculateDirections(markersList.get(0));
+            }
+        });*/
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedPlace + 1 >= 0 && selectedPlace + 1 <= markersList.size()-1) {
+                    calculateDirections(markersList.get(++selectedPlace));
+                }
+            }
+        });
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedPlace - 1 >= 0 && selectedPlace - 1 <= markersList.size()-1) {
+                    calculateDirections(markersList.get(--selectedPlace));
+                }
+            }
+        });
+    }
+
+    private void addData(Place place) {
+        db.collection("marker")
+                .add(place)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "onMap: DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Error adding document", e);
             }
         });
     }

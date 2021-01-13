@@ -9,6 +9,7 @@ import android.Manifest;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lefalexiou.geoar_app.adapters.MainPagerAdapter;
 import com.lefalexiou.geoar_app.R;
 
@@ -18,6 +19,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
     private static final int RC_LOCATION = 123;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -31,6 +33,8 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         askLocationPermissions();
 

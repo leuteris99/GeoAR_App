@@ -4,18 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        style="@style/Fab"
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/fab"-->
+<!--        style="@style/Fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_margin="40dp"-->
+<!--        android:src="@drawable/directions_icon"-->
+<!--        app:fabCustomSize="50dp"-->
+<!--        app:maxImageSize="30dp"-->
+<!--        app:rippleColor="@color/maps_qu_google_blue_500" />-->
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Previous"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="40dp"
-        android:src="@drawable/directions_icon"
-        app:fabCustomSize="50dp"
-        app:maxImageSize="30dp"
-        app:rippleColor="@color/maps_qu_google_blue_500" />
+        android:id="@+id/prev_bt"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/next_bt"
+        android:layout_toEndOf="@id/prev_bt"/>
 
     <fragment
         android:id="@+id/map"
