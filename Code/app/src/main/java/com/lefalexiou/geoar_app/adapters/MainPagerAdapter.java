@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import com.lefalexiou.geoar_app.layout.LiveFragment;
 import com.lefalexiou.geoar_app.layout.MapFragment;
+import com.lefalexiou.geoar_app.layout.MenuFragment;
 
 public class MainPagerAdapter extends FragmentPagerAdapter {
     public MainPagerAdapter(@NonNull FragmentManager fm, int behavior) {
@@ -20,6 +21,8 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
                 return LiveFragment.newInstance();
             case 1:
                 return MapFragment.newInstance();
+            case 2:
+                return MenuFragment.newInstance();
             default:
                 return LiveFragment.newInstance();
         }
