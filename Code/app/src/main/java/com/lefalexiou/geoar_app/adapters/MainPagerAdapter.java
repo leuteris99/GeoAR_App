@@ -4,11 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+
 import com.lefalexiou.geoar_app.layout.LiveFragment;
 import com.lefalexiou.geoar_app.layout.MapFragment;
 import com.lefalexiou.geoar_app.layout.MenuFragment;
+import com.lefalexiou.geoar_app.models.Route;
 
 public class MainPagerAdapter extends FragmentPagerAdapter {
+    private MenuFragment menuFragment;
+    private MapFragment mapFragment;
+    private LiveFragment liveFragment;
+
     public MainPagerAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
@@ -16,13 +22,16 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position){
+        switch (position) {
             case 0:
-                return LiveFragment.newInstance();
+                liveFragment = LiveFragment.newInstance();
+                return liveFragment;
             case 1:
-                return MapFragment.newInstance();
+                mapFragment = MapFragment.newInstance();
+                return mapFragment;
             case 2:
-                return MenuFragment.newInstance();
+                menuFragment = MenuFragment.newInstance();
+                return menuFragment;
             default:
                 return LiveFragment.newInstance();
         }
@@ -31,5 +40,12 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return 3;
+    }
+
+    public MenuFragment getMenuFragmentInstance(){
+        return menuFragment;
+    }
+    public MapFragment getMapFragmentInstance(){
+        return mapFragment;
     }
 }

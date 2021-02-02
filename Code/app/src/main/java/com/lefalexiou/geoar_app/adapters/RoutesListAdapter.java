@@ -1,5 +1,6 @@
 package com.lefalexiou.geoar_app.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.Route;
+
+import java.util.ArrayList;
+
+//TODO: I thing this file is deprecated (not 100% sure, save it and test the app before deletion)
 
 public class RoutesListAdapter extends RecyclerView.Adapter<RoutesListAdapter.ViewHolder> {
-    private String[] localDataSet;
+    private ArrayList<String> localDataSet;
+    private static final String TAG = "RoutesListAdapter";
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
@@ -27,8 +34,13 @@ public class RoutesListAdapter extends RecyclerView.Adapter<RoutesListAdapter.Vi
         }
     }
 
-    public RoutesListAdapter(String[] dataSet) {
-        localDataSet = dataSet;
+    public RoutesListAdapter(ArrayList<Route> dataSet) {
+        localDataSet = new ArrayList<>();
+        Log.d(TAG, "RoutesListAdapter: pre-: " + dataSet);
+        for (Route route : dataSet) {
+            localDataSet.add(route.getTitle());
+        }
+        Log.d(TAG, "RoutesListAdapter: " + localDataSet);
     }
 
     @NonNull
@@ -41,11 +53,11 @@ public class RoutesListAdapter extends RecyclerView.Adapter<RoutesListAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        viewHolder.getTextView().setText(localDataSet[position]);
+        viewHolder.getTextView().setText(localDataSet.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return localDataSet.size();
     }
 }

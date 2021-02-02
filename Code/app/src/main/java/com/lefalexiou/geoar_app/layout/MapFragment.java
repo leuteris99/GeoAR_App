@@ -50,6 +50,7 @@ import com.google.maps.model.DirectionsRoute;
 import com.lefalexiou.geoar_app.R;
 import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.PolylineData;
+import com.lefalexiou.geoar_app.models.Route;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,6 +83,9 @@ public class MapFragment extends Fragment implements
     private List<Marker> markersList = new ArrayList<>();
     private ArrayList<PolylineData> mPolylinesData = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private MapFragmentListener listener;
+    private ArrayList<Place> places;
+    private Route changeRoute;
 
     public MapFragment() {
         // Required empty public constructor
@@ -114,6 +118,20 @@ public class MapFragment extends Fragment implements
     public void onAttach(@NonNull Context context) {
         this.context = context;
         super.onAttach(context);
+
+        if (context instanceof MapFragmentListener) {
+            listener = (MapFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MapFragmentListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        listener = null;
     }
 
     private void initMap() {
@@ -192,14 +210,22 @@ public class MapFragment extends Fragment implements
                 mPolylinesData.clear();
                 mPolylinesData = new ArrayList<>();
             }
+            selectedPlace = -1;
         }
     }
 
-    private void addMarkers(List<Place> places) {
+    private void resetPlacesList() {
+        if (places.size() > 0) {
+            places.clear();
+            places = new ArrayList<>();
+        }
+    }
+
+    private void addMarkers(ArrayList<Place> placeArrayList) {//List<Place> placesList
         // TODO: Reset the markers. On live add this when you change all your markers.
         Log.d(TAG, "addMarker: add marker");
         resetMap();
-        for (Place place : places) {
+        for (Place place : placeArrayList) {
             MarkerOptions options = new MarkerOptions()
                     .position(place.getLatLng())
                     .title(place.getTitle());
@@ -321,28 +347,7 @@ public class MapFragment extends Fragment implements
         Log.d(TAG, "onMapReady: location enable");
 
         //TODO: Testing marker remove it on live
-        db.collection("marker")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<Place> places = new ArrayList<>();
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                Map<String, Object> data = document.getData();
-                                Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
-                                LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
-                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"));
-                                Log.d(TAG, "onMap: place: " + place);
-
-                                places.add(place);
-                            }
-                            addMarkers(places);
-                        } else {
-                            Log.d(TAG, "onMap: fail");
-                        }
-                    }
-                });
+        askData(true);
 
         /*fab.setOnClickListener(new View.OnClickListener() { TODO: to remove
             @Override
@@ -353,7 +358,7 @@ public class MapFragment extends Fragment implements
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedPlace + 1 >= 0 && selectedPlace + 1 <= markersList.size()-1) {
+                if (selectedPlace + 1 >= 0 && selectedPlace + 1 <= markersList.size() - 1) {
                     calculateDirections(markersList.get(++selectedPlace));
                 }
             }
@@ -361,11 +366,46 @@ public class MapFragment extends Fragment implements
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedPlace - 1 >= 0 && selectedPlace - 1 <= markersList.size()-1) {
+                if (selectedPlace - 1 >= 0 && selectedPlace - 1 <= markersList.size() - 1) {
                     calculateDirections(markersList.get(--selectedPlace));
                 }
             }
         });
+    }
+
+    private void askData(boolean isFirstRun) {
+        db.collection("marker")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            places = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                Map<String, Object> data = document.getData();
+                                Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
+                                LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
+                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"));
+                                Log.d(TAG, "onMap: place: " + place);
+
+                                if (isFirstRun) {
+                                    places.add(place);
+                                } else {
+                                    for (String p : changeRoute.getPlaces()) {
+                                        if (place.getTitle().equals(p))
+                                            places.add(place);
+                                    }
+                                }
+
+                            }
+                            addMarkers(places);
+                            Log.d(TAG, "places: " + places);
+
+                        } else {
+                            Log.d(TAG, "onMap: fail");
+                        }
+                    }
+                });
     }
 
     private void addData(Place place) {
@@ -382,5 +422,14 @@ public class MapFragment extends Fragment implements
                 Log.w(TAG, "Error adding document", e);
             }
         });
+    }
+
+    public interface MapFragmentListener {
+        void onMapDataTransfer(Route route);
+    }
+
+    public void updatePlacesData(Route route) {
+        changeRoute = new Route(route.getTitle(), route.getPlaces());
+        askData(false);
     }
 }

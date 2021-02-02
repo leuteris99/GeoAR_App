@@ -7,19 +7,22 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lefalexiou.geoar_app.adapters.MainPagerAdapter;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.Route;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements MenuFragment.MenuFragmentListener, MapFragment.MapFragmentListener {
     private static final String TAG = "MainActivity";
     private static final int RC_LOCATION = 123;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private MainPagerAdapter mainPagerAdapter;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -39,7 +42,8 @@ public class MainActivity extends FragmentActivity {
         askLocationPermissions();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(new MainPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT));
+        mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager.setAdapter(mainPagerAdapter);
 
 
     }
@@ -58,5 +62,14 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    @Override
+    public void onDataTransfer(Route route) {
+        Log.d(TAG, "onDataTransfer: transfering data");
+        mainPagerAdapter.getMapFragmentInstance().updatePlacesData(route);
+    }
 
+    @Override
+    public void onMapDataTransfer(Route route) {
+        Log.d(TAG, "onMapDataTransfer: test");
+    }
 }
