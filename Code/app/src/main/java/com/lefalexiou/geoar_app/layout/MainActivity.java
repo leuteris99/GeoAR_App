@@ -8,8 +8,10 @@ import androidx.viewpager.widget.ViewPager;
 import android.Manifest;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lefalexiou.geoar_app.adapters.MainPagerAdapter;
 import com.lefalexiou.geoar_app.R;
@@ -23,6 +25,8 @@ public class MainActivity extends FragmentActivity implements MenuFragment.MenuF
     private static final int RC_LOCATION = 123;
     private FirebaseAnalytics mFirebaseAnalytics;
     private MainPagerAdapter mainPagerAdapter;
+    private BottomNavigationView bottomNavigationView;
+    private ViewPager viewPager;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -41,12 +45,35 @@ public class MainActivity extends FragmentActivity implements MenuFragment.MenuF
 
         askLocationPermissions();
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = (ViewPager) findViewById(R.id.pager);
         mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(mainPagerAdapter);
 
-
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.live_page:
+                            viewPager.setCurrentItem(0);
+                            break;
+                        case R.id.map_page:
+                            viewPager.setCurrentItem(1);
+                            break;
+                        case R.id.options_page:
+                            viewPager.setCurrentItem(2);
+                            break;
+                        default:
+                            viewPager.setCurrentItem(0);
+                            break;
+                    }
+                    return true;
+                }
+            };
 
     @AfterPermissionGranted(RC_LOCATION)
     private void askLocationPermissions() {
