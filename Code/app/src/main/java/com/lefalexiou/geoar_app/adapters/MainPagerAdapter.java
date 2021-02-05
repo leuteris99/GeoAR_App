@@ -42,10 +42,15 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
         return 3;
     }
 
-    public MenuFragment getMenuFragmentInstance(){
+    public MenuFragment getMenuFragmentInstance() {
         return menuFragment;
     }
-    public MapFragment getMapFragmentInstance(){
+
+    public MapFragment getMapFragmentInstance() {
         return mapFragment;
+    }
+
+    public LiveFragment getLiveFragmentInstance() {
+        return liveFragment;
     }
 }

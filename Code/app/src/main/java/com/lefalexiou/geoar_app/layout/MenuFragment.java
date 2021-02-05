@@ -12,25 +12,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.lefalexiou.geoar_app.R;
 import com.lefalexiou.geoar_app.adapters.RoutesListAdapter;
 import com.lefalexiou.geoar_app.adapters.RoutesRecyclerAdapter;
-import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.Route;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -127,7 +119,7 @@ public class MenuFragment extends Fragment {
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
                 Route route = documentSnapshot.toObject(Route.class);
                 Log.d(TAG, "onItemClick: position: " + position + ", title: " + route.getTitle());
-                listener.onDataTransfer(route);
+                listener.onMenuDataTransfer(route);
             }
         });
 
@@ -135,7 +127,7 @@ public class MenuFragment extends Fragment {
     }
 
     public  interface MenuFragmentListener{
-        void onDataTransfer(Route route);
+        void onMenuDataTransfer(Route route);
     }
 
     @Override

@@ -145,6 +145,9 @@ public class MapFragment extends Fragment implements
                     .apiKey(getString(R.string.google_maps_api_key))
                     .build();
         }
+
+        // TODO: temporary measure, to remove in the future.
+        listener.onMapDataTransfer(new Place(new LatLng(37.9647036, 23.7312254), "Temple of Olympian Zeus", 15));
     }
 
     private void getDeviceLocation() {
@@ -425,7 +428,7 @@ public class MapFragment extends Fragment implements
     }
 
     public interface MapFragmentListener {
-        void onMapDataTransfer(Route route);
+        void onMapDataTransfer(Place nearbyPlace);
     }
 
     public void updatePlacesData(Route route) {

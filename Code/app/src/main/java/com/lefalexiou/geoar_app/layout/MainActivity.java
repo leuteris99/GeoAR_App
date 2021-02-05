@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lefalexiou.geoar_app.adapters.MainPagerAdapter;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.Route;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -90,13 +91,14 @@ public class MainActivity extends FragmentActivity implements MenuFragment.MenuF
     }
 
     @Override
-    public void onDataTransfer(Route route) {
-        Log.d(TAG, "onDataTransfer: transfering data");
+    public void onMenuDataTransfer(Route route) {
+        Log.d(TAG, "onDataTransfer: transferring route data");
         mainPagerAdapter.getMapFragmentInstance().updatePlacesData(route);
     }
 
     @Override
-    public void onMapDataTransfer(Route route) {
-        Log.d(TAG, "onMapDataTransfer: test");
+    public void onMapDataTransfer(Place nearbyPlace) {
+        Log.d(TAG, "onMapDataTransfer: transferring nearby place data");
+        mainPagerAdapter.getLiveFragmentInstance().getNearbyPlace(nearbyPlace);
     }
 }

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,16 @@ import android.widget.RadioButton;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.lefalexiou.geoar_app.R;
 import com.lefalexiou.geoar_app.models.ModelObject;
+import com.lefalexiou.geoar_app.models.Place;
+import com.lefalexiou.geoar_app.models.Route;
 import com.lefalexiou.geoar_app.models.VideoObject;
 import com.lefalexiou.geoar_app.models.ViewObject;
 
+import io.opencensus.tags.Tag;
+
 
 public class LiveFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "LiveFragment";
     private ArFragment arFragment;
     private int itemSelector;
     private String answer;
@@ -137,5 +143,9 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         onRadioButtonClicked(view);
+    }
+
+    public void getNearbyPlace(Place nearbyPlace) {
+        Log.d(TAG, "getNearbyPlace: " + nearbyPlace.getTitle() + ", aoe: " + nearbyPlace.getAOE());
     }
 }
