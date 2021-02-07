@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -87,6 +88,26 @@ public class MapFragment extends Fragment implements
     private ArrayList<Place> places;
     private Route changeRoute;
 
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "run: thread processing");
+
+            for (Place place : places) {
+                getDeviceLocation(false);
+                double distance = Math.sqrt(Math.pow((place.getLatLng().latitude - mUserPosition.latitude), 2) + Math.pow((place.getLatLng().longitude - mUserPosition.longitude), 2));
+//                Log.d(TAG, "getNearbyPlace: distance : "+ distance);
+                if (distance <= (place.getAOE() * 0.00001)) {
+                    listener.onMapDataTransfer(place);
+                    break;
+                }
+            }
+
+            timerHandler.postDelayed(this, 10000);
+        }
+    };
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -111,6 +132,8 @@ public class MapFragment extends Fragment implements
 //        fab = (FloatingActionButton) v.findViewById(R.id.fab); TODO: to remove
         nextButton = (Button) v.findViewById(R.id.next_bt);
         prevButton = (Button) v.findViewById(R.id.prev_bt);
+
+        timerHandler.postDelayed(timerRunnable, 3000);
         return v;
     }
 
@@ -129,6 +152,9 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onDetach() {
+        timerHandler.removeCallbacks(timerRunnable);
+        Log.d(TAG, "run: onDetach: finishing");
+
         super.onDetach();
 
         listener = null;
@@ -145,12 +171,9 @@ public class MapFragment extends Fragment implements
                     .apiKey(getString(R.string.google_maps_api_key))
                     .build();
         }
-
-        // TODO: temporary measure, to remove in the future.
-        listener.onMapDataTransfer(new Place(new LatLng(37.9647036, 23.7312254), "Temple of Olympian Zeus", 15));
     }
 
-    private void getDeviceLocation() {
+    private void getDeviceLocation(boolean toMoveCamera) {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
 
         try {
@@ -170,7 +193,9 @@ public class MapFragment extends Fragment implements
                         assert currentLocation != null;
                         mUserPosition = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-                        moveCamera(mUserPosition, 15f);
+                        if (toMoveCamera) {
+                            moveCamera(mUserPosition, 15f);
+                        }
                     } else {
                         Log.d(TAG, "onComplete: current location is null");
                         Toast.makeText(context, "where are you?", Toast.LENGTH_SHORT).show();
@@ -337,7 +362,7 @@ public class MapFragment extends Fragment implements
         mMap.setOnPolylineClickListener(this);
 
         //getting device position and displaying it on the map
-        getDeviceLocation();
+        getDeviceLocation(true);
 
         //TODO: remove that only for testing
 //        addData(new Place(new LatLng(37.9647036, 23.7312254), "Temple of Olympian Zeus", 15));
@@ -391,9 +416,7 @@ public class MapFragment extends Fragment implements
                                 Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"));
                                 Log.d(TAG, "onMap: place: " + place);
 
-                                if (isFirstRun) {
-                                    places.add(place);
-                                } else {
+                                if (!isFirstRun) {
                                     for (String p : changeRoute.getPlaces()) {
                                         if (place.getTitle().equals(p))
                                             places.add(place);
