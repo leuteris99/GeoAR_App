@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.google.ar.sceneform.ux.ArFragment;
 import com.lefalexiou.geoar_app.R;
@@ -31,6 +32,7 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     private int itemSelector;
     private String answer;
     private Context context;
+    private TextView currentPlaceTextView;
 
     @Nullable
     @Override
@@ -52,6 +54,9 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
         model.setOnClickListener(this);
         RadioButton animatedModel = v.findViewById(R.id.animated_model);
         animatedModel.setOnClickListener(this);
+
+        currentPlaceTextView = v.findViewById(R.id.current_place_text_view);
+        gettingAwayFromPlaces();
 
         assert arFragment != null;
         arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
@@ -147,5 +152,10 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
 
     public void getNearbyPlace(Place nearbyPlace) {
         Log.d(TAG, "getNearbyPlace: " + nearbyPlace.getTitle() + ", aoe: " + nearbyPlace.getAOE());
+        currentPlaceTextView.setText("Current place: " + nearbyPlace.getTitle());
+    }
+
+    public void gettingAwayFromPlaces(){
+        currentPlaceTextView.setText("Current place: None");
     }
 }

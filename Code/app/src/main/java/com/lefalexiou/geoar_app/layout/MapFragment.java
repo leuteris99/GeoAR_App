@@ -87,6 +87,7 @@ public class MapFragment extends Fragment implements
     private MapFragmentListener listener;
     private ArrayList<Place> places;
     private Route changeRoute;
+    boolean isCurrentPlaceSelected = false;
 
     private Handler timerHandler = new Handler();
     private Runnable timerRunnable = new Runnable() {
@@ -100,7 +101,11 @@ public class MapFragment extends Fragment implements
 //                Log.d(TAG, "getNearbyPlace: distance : "+ distance);
                 if (distance <= (place.getAOE() * 0.00001)) {
                     listener.onMapDataTransfer(place);
+                    isCurrentPlaceSelected = true;
                     break;
+                }else if (isCurrentPlaceSelected){
+                    isCurrentPlaceSelected = false;
+                    listener.gettingAwayFromPlaces();
                 }
             }
 
@@ -452,6 +457,7 @@ public class MapFragment extends Fragment implements
 
     public interface MapFragmentListener {
         void onMapDataTransfer(Place nearbyPlace);
+        void gettingAwayFromPlaces();
     }
 
     public void updatePlacesData(Route route) {

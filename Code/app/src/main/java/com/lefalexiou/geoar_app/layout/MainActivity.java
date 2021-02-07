@@ -97,6 +97,11 @@ public class MainActivity extends FragmentActivity implements MenuFragment.MenuF
     }
 
     @Override
+    public void gettingAwayFromPlaces() {
+        mainPagerAdapter.getLiveFragmentInstance().gettingAwayFromPlaces();
+    }
+
+    @Override
     public void onMapDataTransfer(Place nearbyPlace) {
         Log.d(TAG, "onMapDataTransfer: transferring nearby place data");
         mainPagerAdapter.getLiveFragmentInstance().getNearbyPlace(nearbyPlace);
