@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.lefalexiou.geoar_app.layout.LiveFragment;
 import com.lefalexiou.geoar_app.layout.MapFragment;
 import com.lefalexiou.geoar_app.layout.MenuFragment;
-import com.lefalexiou.geoar_app.models.Route;
 
 public class MainPagerAdapter extends FragmentPagerAdapter {
     private MenuFragment menuFragment;

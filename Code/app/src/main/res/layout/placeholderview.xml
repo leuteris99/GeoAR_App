@@ -19,8 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit"
-            android:layout_below="@id/radio_group"
-            android:onClick="onSubmitClick"/>
+            android:layout_below="@id/radio_group"/>
+<!--            android:onClick="onSubmitClick"/>-->
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -34,16 +34,15 @@
                 android:layout_height="wrap_content"
                 android:text="First option"
                 android:textSize="10sp"
-                android:id="@+id/first_choice"
-                android:onClick="onQuestionChoiceClick"/>
-
+                android:id="@+id/first_choice"/>
+<!--                android:onClick="onQuestionChoiceClick"/>-->
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Second option"
                 android:textSize="10sp"
-                android:id="@+id/second_choice"
-                android:onClick="onQuestionChoiceClick"/>
+                android:id="@+id/second_choice"/>
+<!--                android:onClick="onQuestionChoiceClick"/>-->
         </RadioGroup>
 
         <TextView
@@ -62,7 +61,17 @@
             android:text="This is an example of a simple view screen"
             android:textSize="14sp"
             android:textColor="@color/fonts"
-            android:layout_below="@id/logo"/>
+            android:layout_below="@id/holo_title"
+            android:layout_marginBottom="15dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/holo_title"
+            android:text="Title goes here"
+            android:textSize="18sp"
+            android:layout_below="@id/logo"
+            android:layout_marginBottom="20dp"/>
 
         <ImageView
             android:layout_width="wrap_content"

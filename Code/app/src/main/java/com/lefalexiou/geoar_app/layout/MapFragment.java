@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -37,7 +36,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -49,17 +47,16 @@ import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.Hologram;
 import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.PolylineData;
 import com.lefalexiou.geoar_app.models.Route;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import dagger.internal.ProviderOfLazy;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -103,8 +100,8 @@ public class MapFragment extends Fragment implements
                     listener.onMapDataTransfer(place);
                     isCurrentPlaceSelected = true;
                     break;
-                }else if (isCurrentPlaceSelected){
-                    isCurrentPlaceSelected = false;
+                } else  {//if (isCurrentPlaceSelected)
+//                    isCurrentPlaceSelected = false;
                     listener.gettingAwayFromPlaces();
                 }
             }
@@ -370,7 +367,37 @@ public class MapFragment extends Fragment implements
         getDeviceLocation(true);
 
         //TODO: remove that only for testing
-//        addData(new Place(new LatLng(37.9647036, 23.7312254), "Temple of Olympian Zeus", 15));
+        /*addData(new Place(
+                new LatLng(37.971774741979004, 23.72580165163131),
+                "Acropolis of Athens",
+                50,
+                "https://lp-cms-production.imgix.net/2019-06/b3d692e130903b3693711c7b3b1d2a3d887403c4c9ab747773647864e71a51f4.jpg",
+                "This is acropolis of athens",
+                new ArrayList<>(), ""));
+        addData(new Place(
+                new LatLng(37.9647036, 23.7312254),
+                "Temple of Olympian Zeus",
+                40,
+                "https://upload.wikimedia.org/wikipedia/commons/b/b0/Attica_06-13_Athens_25_Olympian_Zeus_Temple.jpg",
+                "This is the temple of the olympian zeus in athens",
+                new ArrayList<>(),
+                ""));
+        addData(new Place(
+                new LatLng(37.96836337537587, 23.7061584792439),
+                "Home",
+                30,
+                "",
+                "That's my home",
+                new ArrayList<>(),
+                ""));
+        addData(new Place(
+                new LatLng(37.9665086, 23.7081846),
+                "Best",
+                20,
+                "https://s3-eu-west-1.amazonaws.com/static.myjobnow.com/photos/RackMultipart20191121-2151-syopak.png",
+                "",
+                new ArrayList<>(),
+                "https://besttaste.gr/"));*/
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onMapReady: permission deny");
@@ -417,9 +444,23 @@ public class MapFragment extends Fragment implements
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 Map<String, Object> data = document.getData();
                                 Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
+                                Map<String, Object> holoData = (Map<String, Object>) data.get("hologram");
+                                Log.d(TAG, "onComplete: holodata: answers:" + holoData.get("answerArray") + ", question: " + holoData.get("question"));
+
+                                ArrayList<String> qArray = new ArrayList<>();
+                                qArray.add((String) holoData.get("question"));
+                                ArrayList<String> tmpAnswers = (ArrayList<String>) holoData.get("answerArray");
+                                qArray.addAll(tmpAnswers);
+
                                 LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
-                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"));
-                                Log.d(TAG, "onMap: place: " + place);
+                                Hologram hologram = new Hologram(
+                                        (String) holoData.get("title"),
+                                        (String) holoData.get("imageURL"),
+                                        (String) holoData.get("description"),
+                                        qArray,
+                                        (String) holoData.get("webURL"));
+                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"), hologram);
+//                                Log.d(TAG, "onMap: place: " + place);
 
                                 if (!isFirstRun) {
                                     for (String p : changeRoute.getPlaces()) {
@@ -457,6 +498,7 @@ public class MapFragment extends Fragment implements
 
     public interface MapFragmentListener {
         void onMapDataTransfer(Place nearbyPlace);
+
         void gettingAwayFromPlaces();
     }
 

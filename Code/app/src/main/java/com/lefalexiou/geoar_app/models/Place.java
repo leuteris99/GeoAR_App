@@ -3,22 +3,35 @@ package com.lefalexiou.geoar_app.models;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.ArrayList;
+
 public class Place {
     private LatLng latLng;
     private String title;
     private long AOE;
+    private Hologram hologram;
 
     public Place() {
     }
 
-    public Place(LatLng latLng, String title, long AOE) {
+    public Place(LatLng latLng, String title, long AOE, String imageURL, String description, ArrayList<String> questionArray, String webURL) {
+
         this.latLng = latLng;
         this.title = title;
         this.AOE = AOE;
+        this.hologram = new Hologram(title, imageURL, description, questionArray, webURL);
     }
 
-    public LatLng makeGeoPointToLatLng(GeoPoint gp){
-        return new LatLng(gp.getLatitude(),gp.getLongitude());
+    public Place(LatLng latLng, String title, long AOE, Hologram hologram) {
+
+        this.latLng = latLng;
+        this.title = title;
+        this.AOE = AOE;
+        this.hologram = hologram;
+    }
+
+    public LatLng makeGeoPointToLatLng(GeoPoint gp) {
+        return new LatLng(gp.getLatitude(), gp.getLongitude());
     }
 
     public LatLng getLatLng() {
@@ -45,12 +58,17 @@ public class Place {
         this.AOE = AOE;
     }
 
+    public Hologram getHologram() {
+        return hologram;
+    }
+
     @Override
     public String toString() {
         return "place{" +
                 "latLng=" + latLng +
                 ", title='" + title + '\'' +
                 ", AOE=" + AOE +
+                ", Hologram=" + hologram.toString() +
                 '}';
     }
 }
