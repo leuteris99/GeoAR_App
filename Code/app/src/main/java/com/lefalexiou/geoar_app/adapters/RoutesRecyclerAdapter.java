@@ -1,11 +1,13 @@
 package com.lefalexiou.geoar_app.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -16,6 +18,7 @@ import com.lefalexiou.geoar_app.models.Route;
 
 public class RoutesRecyclerAdapter extends FirestoreRecyclerAdapter<Route, RoutesRecyclerAdapter.RoutesHolder> {
     private OnItemClickListener listener;
+    private int selectedPosition = -1;
 
     public RoutesRecyclerAdapter(@NonNull FirestoreRecyclerOptions<Route> options) {
         super(options);
@@ -24,6 +27,11 @@ public class RoutesRecyclerAdapter extends FirestoreRecyclerAdapter<Route, Route
     @Override
     protected void onBindViewHolder(@NonNull RoutesHolder holder, int position, @NonNull Route model) {
         holder.textViewTitle.setText(model.getTitle());
+        if (selectedPosition == position){
+            holder.cardView.setBackgroundColor(Color.parseColor("#03A9F4"));
+        }else {
+            holder.cardView.setBackgroundColor(Color.parseColor("#ffffff"));
+        }
     }
 
     @NonNull
@@ -36,10 +44,12 @@ public class RoutesRecyclerAdapter extends FirestoreRecyclerAdapter<Route, Route
 
     class RoutesHolder extends RecyclerView.ViewHolder {
         TextView textViewTitle;
+        CardView cardView;
 
         public RoutesHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.routes_list_item_text);
+            cardView = itemView.findViewById(R.id.routes_list_item_card);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -47,6 +57,8 @@ public class RoutesRecyclerAdapter extends FirestoreRecyclerAdapter<Route, Route
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && listener != null) {
                         listener.onItemClick(getSnapshots().getSnapshot(position), position);
+                        selectedPosition = position;
+                        notifyDataSetChanged();
                     }
                 }
             });

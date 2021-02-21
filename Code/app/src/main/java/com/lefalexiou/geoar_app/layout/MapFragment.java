@@ -47,6 +47,7 @@ import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.ArModel;
 import com.lefalexiou.geoar_app.models.Hologram;
 import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.PolylineData;
@@ -100,7 +101,7 @@ public class MapFragment extends Fragment implements
                     listener.onMapDataTransfer(place);
                     isCurrentPlaceSelected = true;
                     break;
-                } else  {//if (isCurrentPlaceSelected)
+                } else {//if (isCurrentPlaceSelected)
 //                    isCurrentPlaceSelected = false;
                     listener.gettingAwayFromPlaces();
                 }
@@ -445,6 +446,7 @@ public class MapFragment extends Fragment implements
                                 Map<String, Object> data = document.getData();
                                 Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
                                 Map<String, Object> holoData = (Map<String, Object>) data.get("hologram");
+                                Map<String, Object> arModelData = (Map<String, Object>) holoData.get("arModel");
                                 Log.d(TAG, "onComplete: holodata: answers:" + holoData.get("answerArray") + ", question: " + holoData.get("question"));
 
                                 ArrayList<String> qArray = new ArrayList<>();
@@ -453,12 +455,32 @@ public class MapFragment extends Fragment implements
                                 qArray.addAll(tmpAnswers);
 
                                 LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
+
+                                float tmpScale;
+                                float tmpDistFromAnchor;
+                                if (arModelData.get("scale") instanceof Long) {
+                                    tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
+                                } else {
+                                    tmpScale = (float) ((Double) arModelData.get("scale")).floatValue();
+                                }
+                                if (arModelData.get("distFromAnchor") instanceof Long) {
+                                    tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
+                                } else {
+                                    tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
+                                }
+                                ArModel arModel = new ArModel(
+                                        (String) arModelData.get("title"),
+                                        (String) arModelData.get("modelURL"),
+                                        (float) tmpScale,
+                                        (float) tmpDistFromAnchor,
+                                        (int) ((Long)arModelData.get("animationSpeed")).intValue());
                                 Hologram hologram = new Hologram(
                                         (String) holoData.get("title"),
                                         (String) holoData.get("imageURL"),
                                         (String) holoData.get("description"),
                                         qArray,
-                                        (String) holoData.get("webURL"));
+                                        (String) holoData.get("webURL"),
+                                        arModel);
                                 Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"), hologram);
 //                                Log.d(TAG, "onMap: place: " + place);
 
@@ -471,7 +493,7 @@ public class MapFragment extends Fragment implements
 
                             }
                             addMarkers(places);
-                            Log.d(TAG, "places: " + places);
+//                            Log.d(TAG, "places: " + places);
 
                         } else {
                             Log.d(TAG, "onMap: fail");

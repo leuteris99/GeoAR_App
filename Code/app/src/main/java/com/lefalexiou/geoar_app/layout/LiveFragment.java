@@ -1,6 +1,7 @@
 package com.lefalexiou.geoar_app.layout;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,21 +17,24 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Camera;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.lefalexiou.geoar_app.R;
-import com.lefalexiou.geoar_app.models.Hologram;
-import com.lefalexiou.geoar_app.models.ModelObject;
 import com.lefalexiou.geoar_app.models.Place;
-import com.lefalexiou.geoar_app.models.VideoObject;
 import com.lefalexiou.geoar_app.models.ViewObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class LiveFragment extends Fragment implements View.OnClickListener {
@@ -40,12 +44,19 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     private String answer;
     private Context context;
     private TextView currentPlaceTextView;
+    private StorageReference storageReference;
+    private StorageReference modelPathReference;
+    private StorageReference fileReference;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
+        storageReference = FirebaseStorage.getInstance().getReference();
+        modelPathReference = storageReference.child("ar_models");
+
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
         arFragment = (ArFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
@@ -193,11 +204,31 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
         Log.d(TAG, "getNearbyPlace: " + nearbyPlace.getTitle() + ", aoe: " + nearbyPlace.getAOE());
         currentPlaceTextView.setText("Current place: " + nearbyPlace.getTitle());
 
+        fileReference = modelPathReference.child(nearbyPlace.getHologram().getArModel().getModelURL());
+        File file = null;
+        try {
+            file = File.createTempFile("tmp", "sfb");
+            fileReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    Log.d(TAG, "file: onSuccess: file created");
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "file: onFailure: error: " + e.getMessage());
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File finalFile = file;
         arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
             clearTheARScene();
-
             ViewObject viewObject = new ViewObject(arFragment, context, R.layout.placeholderview);
-            viewObject.createViewRenderable(hitResult.createAnchor(), nearbyPlace.getHologram());
+            viewObject.createViewRenderable(hitResult.createAnchor(), nearbyPlace.getHologram(), Uri.fromFile(finalFile));
         }));
     }
 

@@ -1,9 +1,12 @@
 package com.lefalexiou.geoar_app.models;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -17,6 +20,10 @@ import android.widget.VideoView;
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.math.QuaternionEvaluator;
+import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.lefalexiou.geoar_app.R;
@@ -36,9 +43,9 @@ public class ViewObject {
         this.layoutId = layoutId;
     }
 
-    public void createViewRenderable(Anchor anchor, Hologram hologram) {
+    public void createViewRenderable(Anchor anchor, Hologram hologram, Uri fileUri) {
         ViewRenderable.builder().setView(context, layoutId).build().thenAccept(viewRenderable -> {
-            addToScene(viewRenderable, anchor);
+            AnchorNode anchorNode = addToScene(viewRenderable, anchor);
             View v = viewRenderable.getView();
             if (!hologram.getDescription().equals("")) {
                 setText(viewRenderable, R.id.textEx, hologram.getDescription());
@@ -112,6 +119,24 @@ public class ViewObject {
                 webView.setWebViewClient(new WebViewClient());
                 webView.loadUrl(hologram.getWebURL());
             }
+            if (!hologram.getArModel().getTitle().equals("")) {
+                ModelRenderable.builder().setSource(context, fileUri).build().thenAccept(modelRenderable -> {
+                    Node node = new Node();
+                    node.setRenderable(modelRenderable);
+                    node.setParent(anchorNode);
+                    node.setLocalPosition(new Vector3(-(hologram.getArModel().getDistFromAnchor()), 0.8f, 0));
+                    node.setLocalScale(new Vector3(hologram.getArModel().getScale(), hologram.getArModel().getScale(), hologram.getArModel().getScale()));
+                    anchorNode.addChild(node);
+                    modelRenderable.setShadowCaster(false);
+                    modelRenderable.setShadowReceiver(false);
+
+                    ObjectAnimator objectAnimator = createAnimator();
+                    objectAnimator.setTarget(node);
+                    objectAnimator.setDuration(hologram.getArModel().getAnimationSpeed()); // the time need for the animation to complete / make one rotation in milli sec.
+                    objectAnimator.start();
+
+                });
+            }
         });
     }
 
@@ -173,13 +198,20 @@ public class ViewObject {
         }
     }
 
-    private void addToScene(ViewRenderable viewRenderable, Anchor anchor) {
+    private AnchorNode addToScene(ViewRenderable viewRenderable, Anchor anchor) {
         viewRenderable.setShadowCaster(false);
         viewRenderable.setShadowReceiver(false);
 
         AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setRenderable(viewRenderable);
         arFragment.getArSceneView().getScene().addChild(anchorNode);
+
+        Node node = new Node();
+        node.setRenderable(viewRenderable);
+        node.setParent(anchorNode);
+        node.setLocalPosition(new Vector3(0, 0.6f, 0));
+        anchorNode.addChild(node);
+
+        return anchorNode;
 
 //        View view = viewRenderable.getView();
 
@@ -197,5 +229,31 @@ public class ViewObject {
         MediaController mediaController = new MediaController(context);
         videoView.setMediaController(mediaController);
         mediaController.setAnchorView(videoView);
+    }
+
+    private static ObjectAnimator createAnimator() {
+        // Node's setLocalRotation method accepts Quaternions as parameters.
+        // First, set up orientations that will animate a circle.
+        Quaternion orientation1 = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), 0);
+        Quaternion orientation2 = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), 120);
+        Quaternion orientation3 = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), 240);
+        Quaternion orientation4 = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), 360);
+
+        ObjectAnimator orbitAnimation = new ObjectAnimator();
+        orbitAnimation.setObjectValues(orientation1, orientation2, orientation3, orientation4);
+
+        // Next, give it the localRotation property.
+        orbitAnimation.setPropertyName("localRotation");
+
+        // Use Sceneform's QuaternionEvaluator.
+        orbitAnimation.setEvaluator(new QuaternionEvaluator());
+
+        //  Allow orbitAnimation to repeat forever
+        orbitAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        orbitAnimation.setRepeatMode(ObjectAnimator.RESTART);
+        orbitAnimation.setInterpolator(new LinearInterpolator());
+        orbitAnimation.setAutoCancel(true);
+
+        return orbitAnimation;
     }
 }

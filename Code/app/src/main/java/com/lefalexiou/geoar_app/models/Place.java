@@ -1,5 +1,7 @@
 package com.lefalexiou.geoar_app.models;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -12,14 +14,6 @@ public class Place {
     private Hologram hologram;
 
     public Place() {
-    }
-
-    public Place(LatLng latLng, String title, long AOE, String imageURL, String description, ArrayList<String> questionArray, String webURL) {
-
-        this.latLng = latLng;
-        this.title = title;
-        this.AOE = AOE;
-        this.hologram = new Hologram(title, imageURL, description, questionArray, webURL);
     }
 
     public Place(LatLng latLng, String title, long AOE, Hologram hologram) {
@@ -62,6 +56,7 @@ public class Place {
         return hologram;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "place{" +

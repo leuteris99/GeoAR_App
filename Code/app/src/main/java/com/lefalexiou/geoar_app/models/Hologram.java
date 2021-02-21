@@ -1,5 +1,7 @@
 package com.lefalexiou.geoar_app.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class Hologram {
@@ -9,11 +11,10 @@ public class Hologram {
     private String question = "";
     private ArrayList<String> answerArray;
     private String webURL = "";
+    private ArModel arModel;
+    private static final String TAG = "Hologram";
 
-    public Hologram() {
-    }
-
-    public Hologram(String title, String imageURL, String description, ArrayList<String> questionArray, String webURL) {
+    public Hologram(String title, String imageURL, String description, ArrayList<String> questionArray, String webURL, ArModel arModel) {
         this.title = title;
         if (!imageURL.equals("")) {
             this.imageURL = imageURL;
@@ -27,6 +28,9 @@ public class Hologram {
         }
         if (!webURL.equals("")) {
             this.webURL = webURL;
+        }
+        if (!arModel.getTitle().equals("")){
+            this.arModel = arModel;
         }
     }
 
@@ -54,6 +58,11 @@ public class Hologram {
         return webURL;
     }
 
+    public ArModel getArModel() {
+        return arModel;
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "Hologram{" +
@@ -63,6 +72,7 @@ public class Hologram {
                 ", question='" + question + '\'' +
                 ", answerArray=" + answerArray +
                 ", webURL='" + webURL + '\'' +
+                ", arModel=" + arModel.toString() + '\'' +
                 '}';
     }
 }
