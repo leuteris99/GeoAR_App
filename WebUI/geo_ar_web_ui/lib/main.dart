@@ -21,6 +21,11 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        textTheme: TextTheme(
+            bodyText1: TextStyle(
+              color: Colors.white,
+            ),
+            bodyText2: TextStyle(color: Colors.white)),
       ),
       home: MyHomePage(title: 'GeoAR app-Web UI'),
     );
@@ -46,19 +51,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -71,69 +63,60 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Center(child: Text(widget.title)),
+        backgroundColor: Colors.black,
       ),
+      backgroundColor: Colors.black,
       body: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Container(
-            width: (MediaQuery.of(context).size.width) / 5.0,
-            child: Card(
-              child: new Column(
-                children: <Widget>[
-                  Text('Routes'),
-                  Text("one"),
-                  Text('tow'),
-                  Text('three')
-                ],
-              ),
-              color: Colors.green,
-            ),
-          ),
-          Container(
-            width: (MediaQuery.of(context).size.width) / 5.0,
-            child: Card(
-              child: new Column(
-                children: <Widget>[
-                  Text('Places'),
-                  Text("one"),
-                  Text('tow'),
-                  Text('three')
-                ],
-              ),
-              color: Colors.blue,
-            ),
-          ),
-          Container(
-            width: (MediaQuery.of(context).size.width) / 5.0,
-            child: Card(
-              child: new Column(
-                children: <Widget>[
-                  Text('Holograms'),
-                  Text("one"),
-                  Text('tow'),
-                  Text('three')
-                ],
-              ),
-              color: Colors.red,
-            ),
-          ),
-          Container(
-            width: (MediaQuery.of(context).size.width) / 5.0,
-            child: Card(
-              child: new Column(
-                children: <Widget>[
-                  Text('Models'),
-                  Text("one"),
-                  Text('tow'),
-                  Text('three')
-                ],
-              ),
-              color: Colors.yellow,
-            ),
-          ),
+          makeList("Routes", context, ["one", "two", "Three"]),
+          makeList("Places", context, ["one", "two", "Three"]),
+          makeList("Holograms", context, ["one", "two", "Three"]),
+          makeList("Models", context, ["one", "two", "Three"]),
         ],
       ),
     );
   }
+}
+
+Container makeList(String title, var context, List<String> list) {
+  List<Widget> textList = [];
+  textList.add(Container(
+    height: 20,
+  ));
+  textList.add(makeItem(title, context));
+
+  for (String item in list) {
+    textList.add(makeItem(item, context));
+  }
+  return Container(
+    width: (getScreenWidth(context)) / 5.0,
+    child: Card(
+      child: new Column(
+        children: textList,
+      ),
+      color: Colors.grey[900],
+    ),
+  );
+}
+
+Widget makeItem(String name, var context) {
+  return Container(
+    height: 50,
+    width: (getScreenWidth(context) / 5.0) - 20,
+    margin: const EdgeInsets.all(8.0),
+    child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      color: Colors.black,
+      child: Align(
+        alignment: Alignment(-0.8,0.0),
+        child: Text(name),
+      ),
+    ),
+  );
+}
+
+double getScreenWidth(var context) {
+  return MediaQuery.of(context).size.width;
 }
