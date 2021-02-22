@@ -3,25 +3,24 @@ package com.lefalexiou.geoar_app.models;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.GeoPoint;
-
-import java.util.ArrayList;
 
 public class Place {
     private LatLng latLng;
     private String title;
     private long AOE;
-    private Hologram hologram;
+    private DocumentReference hologramReference;
 
     public Place() {
     }
 
-    public Place(LatLng latLng, String title, long AOE, Hologram hologram) {
+    public Place(LatLng latLng, String title, long AOE, DocumentReference hologramReference) {
 
         this.latLng = latLng;
         this.title = title;
         this.AOE = AOE;
-        this.hologram = hologram;
+        this.hologramReference = hologramReference;
     }
 
     public LatLng makeGeoPointToLatLng(GeoPoint gp) {
@@ -52,8 +51,8 @@ public class Place {
         this.AOE = AOE;
     }
 
-    public Hologram getHologram() {
-        return hologram;
+    public DocumentReference getHologramReference() {
+        return hologramReference;
     }
 
     @NonNull
@@ -63,7 +62,7 @@ public class Place {
                 "latLng=" + latLng +
                 ", title='" + title + '\'' +
                 ", AOE=" + AOE +
-                ", Hologram=" + hologram.toString() +
+                ", Hologram=" + hologramReference.getPath() +
                 '}';
     }
 }

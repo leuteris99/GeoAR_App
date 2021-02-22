@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -98,8 +99,81 @@ public class MapFragment extends Fragment implements
                 double distance = Math.sqrt(Math.pow((place.getLatLng().latitude - mUserPosition.latitude), 2) + Math.pow((place.getLatLng().longitude - mUserPosition.longitude), 2));
 //                Log.d(TAG, "getNearbyPlace: distance : "+ distance);
                 if (distance <= (place.getAOE() * 0.00001)) {
-                    listener.onMapDataTransfer(place);
-                    isCurrentPlaceSelected = true;
+                    db.document(place
+                            .getHologramReference()
+                            .getPath())
+                            .get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    Map<String, Object> map = documentSnapshot.getData();
+
+                                    ArrayList<String> qArray = new ArrayList<>();
+                                    qArray.add((String) map.get("question"));
+                                    ArrayList<String> tmpAnswers = (ArrayList<String>) map.get("answerArray");
+                                    qArray.addAll(tmpAnswers);
+
+                                    Hologram hologram = null;
+                                    if (map.get("arModelReference") instanceof String) {
+                                        hologram = new Hologram(
+                                                (String) map.get("title"),
+                                                (String) map.get("imageURL"),
+                                                (String) map.get("description"),
+                                                (ArrayList<String>) qArray,
+                                                (String) map.get("webURL"),
+                                                null
+                                        );
+                                    } else if (map.get("arModelReference") instanceof DocumentReference) {
+                                        hologram = new Hologram(
+                                                (String) map.get("title"),
+                                                (String) map.get("imageURL"),
+                                                (String) map.get("description"),
+                                                (ArrayList<String>) qArray,
+                                                (String) map.get("webURL"),
+                                                (DocumentReference) map.get("arModelReference")
+                                        );
+                                    }
+
+
+                                    if (hologram.getArModel() != null) {
+                                        Hologram finalHologram = hologram;
+                                        db.document(hologram.getArModel().getPath()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                Map<String, Object> arModelData = documentSnapshot.getData();
+
+                                                float tmpScale;
+                                                float tmpDistFromAnchor;
+                                                if (arModelData.get("scale") instanceof Long) {
+                                                    tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
+                                                } else {
+                                                    tmpScale = (float) ((Double) arModelData.get("scale")).floatValue();
+                                                }
+                                                if (arModelData.get("distFromAnchor") instanceof Long) {
+                                                    tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
+                                                } else {
+                                                    tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
+                                                }
+
+                                                ArModel arModel = new ArModel(
+                                                        (String) arModelData.get("title"),
+                                                        (String) arModelData.get("modelURL"),
+                                                        (float) tmpScale,
+                                                        (float) tmpDistFromAnchor,
+                                                        (int) ((Long) arModelData.get("animationSpeed")).intValue());
+
+                                                listener.onMapDataTransfer(place, finalHologram, arModel);
+                                                isCurrentPlaceSelected = true;
+                                            }
+                                        });
+                                    } else {
+                                        listener.onMapDataTransfer(place, hologram, null);
+                                        isCurrentPlaceSelected = true;
+                                    }
+
+                                }
+                            });
+
                     break;
                 } else {//if (isCurrentPlaceSelected)
 //                    isCurrentPlaceSelected = false;
@@ -445,18 +519,16 @@ public class MapFragment extends Fragment implements
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 Map<String, Object> data = document.getData();
                                 Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
-                                Map<String, Object> holoData = (Map<String, Object>) data.get("hologram");
-                                Map<String, Object> arModelData = (Map<String, Object>) holoData.get("arModel");
-                                Log.d(TAG, "onComplete: holodata: answers:" + holoData.get("answerArray") + ", question: " + holoData.get("question"));
+//                                Map<String, Object> holoData = (Map<String, Object>) data.get("hologram");
 
-                                ArrayList<String> qArray = new ArrayList<>();
+                                /*ArrayList<String> qArray = new ArrayList<>();
                                 qArray.add((String) holoData.get("question"));
                                 ArrayList<String> tmpAnswers = (ArrayList<String>) holoData.get("answerArray");
-                                qArray.addAll(tmpAnswers);
+                                qArray.addAll(tmpAnswers);*/
 
                                 LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
 
-                                float tmpScale;
+                                /*float tmpScale;
                                 float tmpDistFromAnchor;
                                 if (arModelData.get("scale") instanceof Long) {
                                     tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
@@ -467,8 +539,8 @@ public class MapFragment extends Fragment implements
                                     tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
                                 } else {
                                     tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
-                                }
-                                ArModel arModel = new ArModel(
+                                }*/
+                                /*ArModel arModel = new ArModel(
                                         (String) arModelData.get("title"),
                                         (String) arModelData.get("modelURL"),
                                         (float) tmpScale,
@@ -480,8 +552,8 @@ public class MapFragment extends Fragment implements
                                         (String) holoData.get("description"),
                                         qArray,
                                         (String) holoData.get("webURL"),
-                                        arModel);
-                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"), hologram);
+                                        arModel);*/
+                                Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"), (DocumentReference) data.get("hologramReference"));
 //                                Log.d(TAG, "onMap: place: " + place);
 
                                 if (!isFirstRun) {
@@ -519,7 +591,7 @@ public class MapFragment extends Fragment implements
     }
 
     public interface MapFragmentListener {
-        void onMapDataTransfer(Place nearbyPlace);
+        void onMapDataTransfer(Place nearbyPlace, Hologram hologram, ArModel arModel);
 
         void gettingAwayFromPlaces();
     }

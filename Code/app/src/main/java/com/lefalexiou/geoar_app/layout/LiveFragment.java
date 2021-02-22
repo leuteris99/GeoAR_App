@@ -28,6 +28,8 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lefalexiou.geoar_app.R;
+import com.lefalexiou.geoar_app.models.ArModel;
+import com.lefalexiou.geoar_app.models.Hologram;
 import com.lefalexiou.geoar_app.models.Place;
 import com.lefalexiou.geoar_app.models.ViewObject;
 
@@ -47,6 +49,7 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     private StorageReference storageReference;
     private StorageReference modelPathReference;
     private StorageReference fileReference;
+    private File file = null;
 
     @Nullable
     @Override
@@ -128,6 +131,14 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     public void onDestroy() {
         super.onDestroy();
         clearTheARScene();
+
+        if (file.exists()) {
+            if (file.delete()) {
+                Log.d(TAG, "onDestroy: tmp model file destroyed.");
+            } else {
+                Log.d(TAG, "onDestroy: error: tmp model file didn't get destroyed.");
+            }
+        }
     }
 
     public void onRadioButtonClicked(View view) {
@@ -200,35 +211,39 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
     }
 
     // setup the hologram based on a place
-    public void getNearbyPlace(Place nearbyPlace) {
+    public void getNearbyPlace(Place nearbyPlace, Hologram hologram, ArModel arModel) {
         Log.d(TAG, "getNearbyPlace: " + nearbyPlace.getTitle() + ", aoe: " + nearbyPlace.getAOE());
         currentPlaceTextView.setText("Current place: " + nearbyPlace.getTitle());
 
-        fileReference = modelPathReference.child(nearbyPlace.getHologram().getArModel().getModelURL());
-        File file = null;
-        try {
-            file = File.createTempFile("tmp", "sfb");
-            fileReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    Log.d(TAG, "file: onSuccess: file created");
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "file: onFailure: error: " + e.getMessage());
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (arModel != null) {
+            fileReference = modelPathReference.child(arModel.getModelURL());
+            try {
+                file = File.createTempFile("tmp", "sfb");
+                fileReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        Log.d(TAG, "file: onSuccess: file created");
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "file: onFailure: error: " + e.getMessage());
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            file = null;
         }
 
         File finalFile = file;
         arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
             clearTheARScene();
             ViewObject viewObject = new ViewObject(arFragment, context, R.layout.placeholderview);
-            viewObject.createViewRenderable(hitResult.createAnchor(), nearbyPlace.getHologram(), Uri.fromFile(finalFile));
+            viewObject.createViewRenderable(hitResult.createAnchor(), hologram, arModel, Uri.fromFile(finalFile));
         }));
     }
 

@@ -43,7 +43,7 @@ public class ViewObject {
         this.layoutId = layoutId;
     }
 
-    public void createViewRenderable(Anchor anchor, Hologram hologram, Uri fileUri) {
+    public void createViewRenderable(Anchor anchor, Hologram hologram, ArModel arModel, Uri fileUri) {
         ViewRenderable.builder().setView(context, layoutId).build().thenAccept(viewRenderable -> {
             AnchorNode anchorNode = addToScene(viewRenderable, anchor);
             View v = viewRenderable.getView();
@@ -119,20 +119,20 @@ public class ViewObject {
                 webView.setWebViewClient(new WebViewClient());
                 webView.loadUrl(hologram.getWebURL());
             }
-            if (!hologram.getArModel().getTitle().equals("")) {
+            if (fileUri != null) {
                 ModelRenderable.builder().setSource(context, fileUri).build().thenAccept(modelRenderable -> {
                     Node node = new Node();
                     node.setRenderable(modelRenderable);
                     node.setParent(anchorNode);
-                    node.setLocalPosition(new Vector3(-(hologram.getArModel().getDistFromAnchor()), 0.8f, 0));
-                    node.setLocalScale(new Vector3(hologram.getArModel().getScale(), hologram.getArModel().getScale(), hologram.getArModel().getScale()));
+                    node.setLocalPosition(new Vector3(-(arModel.getDistFromAnchor()), 0.8f, 0));
+                    node.setLocalScale(new Vector3(arModel.getScale(), arModel.getScale(), arModel.getScale()));
                     anchorNode.addChild(node);
                     modelRenderable.setShadowCaster(false);
                     modelRenderable.setShadowReceiver(false);
 
                     ObjectAnimator objectAnimator = createAnimator();
                     objectAnimator.setTarget(node);
-                    objectAnimator.setDuration(hologram.getArModel().getAnimationSpeed()); // the time need for the animation to complete / make one rotation in milli sec.
+                    objectAnimator.setDuration(arModel.getAnimationSpeed()); // the time need for the animation to complete / make one rotation in milli sec.
                     objectAnimator.start();
 
                 });

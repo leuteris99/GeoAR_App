@@ -2,6 +2,8 @@ package com.lefalexiou.geoar_app.models;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.DocumentReference;
+
 import java.util.ArrayList;
 
 public class Hologram {
@@ -11,10 +13,10 @@ public class Hologram {
     private String question = "";
     private ArrayList<String> answerArray;
     private String webURL = "";
-    private ArModel arModel;
+    private DocumentReference arModelReference = null;
     private static final String TAG = "Hologram";
 
-    public Hologram(String title, String imageURL, String description, ArrayList<String> questionArray, String webURL, ArModel arModel) {
+    public Hologram(String title, String imageURL, String description, ArrayList<String> questionArray, String webURL, DocumentReference arModelReference) {
         this.title = title;
         if (!imageURL.equals("")) {
             this.imageURL = imageURL;
@@ -29,8 +31,8 @@ public class Hologram {
         if (!webURL.equals("")) {
             this.webURL = webURL;
         }
-        if (!arModel.getTitle().equals("")){
-            this.arModel = arModel;
+        if (arModelReference != null) {
+            this.arModelReference = arModelReference;
         }
     }
 
@@ -58,8 +60,8 @@ public class Hologram {
         return webURL;
     }
 
-    public ArModel getArModel() {
-        return arModel;
+    public DocumentReference getArModel() {
+        return arModelReference;
     }
 
     @NonNull
@@ -72,7 +74,7 @@ public class Hologram {
                 ", question='" + question + '\'' +
                 ", answerArray=" + answerArray +
                 ", webURL='" + webURL + '\'' +
-                ", arModel=" + arModel.toString() + '\'' +
+                ", arModel=" + arModelReference.getPath() + '\'' +
                 '}';
     }
 }
