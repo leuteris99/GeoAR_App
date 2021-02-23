@@ -4,10 +4,35 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 // Import the firestore plugin
 import 'package:cloud_firestore/cloud_firestore.dart';
+// Import the firebase authentication plugin
+import 'package:firebase_auth/firebase_auth.dart';
+
+// Project Imports
+import 'screen/authPage.dart';
+
+// TO DEPLOY: run "powershell -ExecutionPolicy Bypass" to be able to run scripts with powershell
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(
+    new MaterialApp(
+        title: 'Web UI',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          textTheme: TextTheme(
+            bodyText1: TextStyle(
+              color: Colors.white,
+            ),
+            bodyText2: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+        home: new MyApp(),
+        routes: <String, WidgetBuilder>{
+          "/home": (BuildContext context) => new MyHomePage(title: "Web UI"),
+        }),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -26,7 +51,7 @@ class MyApp extends StatelessWidget {
 
         // Once complete init the firebase connection start the app
         if (snapshot.connectionState == ConnectionState.done) {
-          return startHomePage();
+          return AuthPage();
         }
 
         // show something whilst waiting for initialization to complete
@@ -34,34 +59,16 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget startHomePage() {
-    return MaterialApp(
-      title: 'Web UI',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: TextTheme(
-            bodyText1: TextStyle(
-              color: Colors.white,
-            ),
-            bodyText2: TextStyle(color: Colors.white)),
-      ),
-      home: MyHomePage(title: 'GeoAR app-Web UI'),
-    );
-  }
+Widget somethingWentWrong() {
+  return Text("ERROR: Something went wrong :(");
+}
 
-  Widget somethingWentWrong() {
-    return Text("ERROR: Something went wrong :(");
-  }
-
-  Widget loading() {
-    return MaterialApp(
-      title: "web ui",
-      home: Scaffold(
-        body: Text("Loading..."),
-      ),
-    );
-  }
+Widget loading() {
+  return Scaffold(
+    body: Text("Loading..."),
+  );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -215,4 +222,8 @@ Widget makeAddButton(var context, String category) {
 
 double getScreenWidth(var context) {
   return MediaQuery.of(context).size.width;
+}
+
+double getScreenHeight(var context) {
+  return MediaQuery.of(context).size.height;
 }
