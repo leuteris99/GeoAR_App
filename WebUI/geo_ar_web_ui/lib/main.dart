@@ -1,25 +1,44 @@
+// Import material components
 import 'package:flutter/material.dart';
+// Import the firebase_core plugin
+import 'package:firebase_core/firebase_core.dart';
+// Import the firestore plugin
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // Create the initialization Future outside of `build`:
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _initialization,
+      builder: (context, snapshot) {
+        // check for errors
+        if (snapshot.hasError) {
+          return somethingWentWrong();
+        }
+
+        // Once complete init the firebase connection start the app
+        if (snapshot.connectionState == ConnectionState.done) {
+          return startHomePage();
+        }
+
+        // show something whilst waiting for initialization to complete
+        return Text("Loading...");
+      },
+    );
+  }
+
+  Widget startHomePage() {
     return MaterialApp(
       title: 'Web UI',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
         textTheme: TextTheme(
             bodyText1: TextStyle(
@@ -30,20 +49,23 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(title: 'GeoAR app-Web UI'),
     );
   }
+
+  Widget somethingWentWrong() {
+    return Text("ERROR: Something went wrong :(");
+  }
+
+  Widget loading() {
+    return MaterialApp(
+      title: "web ui",
+      home: Scaffold(
+        body: Text("Loading..."),
+      ),
+    );
+  }
 }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -51,18 +73,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  List<String> routes = [];
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // _firebaseFirestore
+    //     .collection("routes")
+    //     .get()
+    //     .then((QuerySnapshot querySnapshot) {
+    //   querySnapshot.docs.forEach((doc) {
+    //     routes.add(doc["title"]);
+    //   });
+    //   print(routes);
+    // });
+    return startScaffold();
+  }
+
+  Widget startScaffold() {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Center(child: Text(widget.title)),
         backgroundColor: Colors.black,
       ),
@@ -70,34 +100,51 @@ class _MyHomePageState extends State<MyHomePage> {
       body: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          makeList("Routes", context, ["one", "two", "Three"]),
-          makeList("Places", context, ["one", "two", "Three"]),
-          makeList("Holograms", context, ["one", "two", "Three"]),
-          makeList("Models", context, ["one", "two", "Three"]),
+          makeList("Routes", context, "routes", _firebaseFirestore),
+          makeList("Places", context, "marker", _firebaseFirestore),
+          makeList("Holograms", context, "hologram", _firebaseFirestore),
+          makeList("Models", context, "arModel", _firebaseFirestore),
         ],
       ),
     );
   }
 }
 
-Container makeList(String title, var context, List<String> list) {
+Widget makeList(String title, var context, String collectionName,
+    FirebaseFirestore _firebaseFirestore) {
   List<Widget> textList = [];
   textList.add(Container(
     height: 20,
   ));
-  textList.add(makeItem(title, context));
+  textList.add(makeCategoryTitle(title, context));
 
-  for (String item in list) {
-    textList.add(makeItem(item, context));
-  }
-  return Container(
-    width: (getScreenWidth(context)) / 5.0,
-    child: Card(
-      child: new Column(
-        children: textList,
-      ),
-      color: Colors.grey[900],
-    ),
+  return FutureBuilder<QuerySnapshot>(
+    future: _firebaseFirestore.collection(collectionName).get(),
+    builder:
+        (BuildContext builderContext, AsyncSnapshot<QuerySnapshot> snapshot) {
+      if (snapshot.hasError) {
+        return Text("Something went wrong");
+      }
+
+      if (snapshot.connectionState == ConnectionState.done) {
+        snapshot.data.docs.forEach((doc) {
+          textList.add(makeItem(doc["title"], context));
+        });
+        textList.add(makeAddButton(context, title));
+
+        return Container(
+          width: (getScreenWidth(context)) / 5.0,
+          child: Card(
+            child: new Column(
+              children: textList,
+            ),
+            color: Colors.grey[900],
+          ),
+        );
+      }
+
+      return Text("loading");
+    },
   );
 }
 
@@ -109,9 +156,58 @@ Widget makeItem(String name, var context) {
     child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       color: Colors.black,
-      child: Align(
-        alignment: Alignment(-0.8,0.0),
-        child: Text(name),
+      child: InkWell(
+        customBorder:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(name),
+          duration: const Duration(milliseconds: 500),
+        )),
+        child: Align(
+          alignment: Alignment(-0.8, 0.0),
+          child: Text(name),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget makeCategoryTitle(String name, var context) {
+  return Container(
+    height: 100,
+    width: (getScreenWidth(context) / 5.0) - 20,
+    margin: const EdgeInsets.all(10.0),
+    child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      color: Colors.black,
+      child: Center(
+        child: Text(
+          name,
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget makeAddButton(var context, String category) {
+  return MaterialButton(
+    height: 40,
+    minWidth: 60,
+    color: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(40),
+    ),
+    child: Icon(
+      Icons.add,
+      color: Colors.white,
+    ),
+    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("add item to " + category),
+        duration: Duration(milliseconds: 500),
       ),
     ),
   );
