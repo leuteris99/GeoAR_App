@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_ar_web_ui/screen/dialogs/showItemDialog.dart';
 import 'package:geo_ar_web_ui/services/authService.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () async{
+            onPressed: () async {
               await _auth.signOut();
             },
           ),
@@ -107,10 +108,14 @@ Widget makeItem(String name, var context) {
       child: InkWell(
         customBorder:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(name),
-          duration: const Duration(milliseconds: 500),
-        )),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(name),
+              duration: const Duration(milliseconds: 500),
+            ),
+          );
+        },
         child: Align(
           alignment: Alignment(-0.8, 0.0),
           child: Text(name),
@@ -152,12 +157,15 @@ Widget makeAddButton(var context, String category) {
       Icons.add,
       color: Colors.white,
     ),
-    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("add item to " + category),
-        duration: Duration(milliseconds: 500),
-      ),
-    ),
+    onPressed: () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("add item to " + category),
+          duration: Duration(milliseconds: 500),
+        ),
+      );
+      _execShowItemDialog(context);
+    },
   );
 }
 
@@ -167,4 +175,24 @@ double getScreenWidth(var context) {
 
 double getScreenHeight(var context) {
   return MediaQuery.of(context).size.height;
+}
+
+void _execShowItemDialog(var context) async {
+  String save = await Navigator.of(context).push(
+    new MaterialPageRoute<String>(
+      builder: (BuildContext builderContext) {
+        return new ShowItemDialog();
+      },
+      fullscreenDialog: true,
+    ),
+  );
+
+  if (save != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(save),
+        duration: Duration(milliseconds: 500),
+      ),
+    );
+  }
 }
