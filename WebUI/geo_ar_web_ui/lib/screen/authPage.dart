@@ -9,11 +9,15 @@ class AuthPage extends StatefulWidget {
   _AuthPageState createState() => _AuthPageState();
 }
 
+final _formKey = GlobalKey<FormState>();
+
 class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController emailController = TextEditingController();
     TextEditingController passController = TextEditingController();
+
+    AuthService as = AuthService();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -26,6 +30,7 @@ class _AuthPageState extends State<AuthPage> {
       ),
       body: Center(
         child: Form(
+          key: _formKey,
           child: Column(
             children: <Widget>[
               Container(
@@ -46,8 +51,20 @@ class _AuthPageState extends State<AuthPage> {
                       padding: EdgeInsets.only(
                           left: 30, right: 30, top: 0, bottom: 0),
                       width: getScreenWidth(context) / 3,
+                      // The email field
                       child: TextFormField(
                         autofillHints: [AutofillHints.email],
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please enter your email.";
+                          } else {
+                            String tmp = as.validationResult;
+                            if (tmp == "No user found for that email." || tmp == "The email address is badly formatted.") {
+                              return tmp;
+                            }
+                          }
+                          return null;
+                        },
                         controller: emailController,
                         style: TextStyle(
                           color: Colors.white,
@@ -72,8 +89,20 @@ class _AuthPageState extends State<AuthPage> {
                       padding: const EdgeInsets.only(
                           left: 30.0, right: 30.0, top: 15, bottom: 20),
                       //padding: EdgeInsets.symmetric(horizontal: 15),
+                      // The password field
                       child: TextFormField(
                         autofillHints: [AutofillHints.password],
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please enter your password.";
+                          } else {
+                            String tmp = as.validationResult;
+                            if (tmp == "Wrong password provided for that user.") {
+                              return tmp;
+                            }
+                          }
+                          return null;
+                        },
                         controller: passController,
                         // textInputAction: TextInputAction.go,
                         style: TextStyle(
@@ -111,7 +140,7 @@ class _AuthPageState extends State<AuthPage> {
                   color: Colors.white,
                 ),
                 onPressed: () async {
-                  AuthService as = AuthService();
+                  _formKey.currentState.validate();
                   await as.signIn(
                     emailController.text,
                     passController.text,

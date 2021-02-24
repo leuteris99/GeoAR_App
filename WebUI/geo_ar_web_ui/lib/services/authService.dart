@@ -5,6 +5,7 @@ import 'package:geo_ar_web_ui/models/myUser.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  String _validationResult;
   MyUser _user(User user) {
     return user != null ? MyUser(uid: user.uid) : null;
   }
@@ -21,20 +22,26 @@ class AuthService {
         email: email,
         password: password,
       );
+      _validationResult = null;
       return _user(userCredential.user);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
-        ScaffoldMessenger.of(context).showSnackBar(
-            new SnackBar(content: Text('No user found for that email.')));
+        _validationResult = "No user found for that email.";
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
-        ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
-            content: Text('Wrong password provided for that user.')));
-      } else {
+        _validationResult = "Wrong password provided for that user.";
+      } else if(e.code == "invalid-email") {
         print(e.message);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(new SnackBar(content: Text(e.message)));
+        _validationResult = "The email address is badly formatted.";
+      }else {
+        print(e.code);
+        _validationResult = null;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+          ),
+        );
       }
       return null;
     }
@@ -42,11 +49,15 @@ class AuthService {
 
   // sign out
   Future signOut() async {
-    try{
+    try {
       return await _auth.signOut();
-    }catch(e){
+    } catch (e) {
       print(e.toString());
       return null;
     }
+  }
+
+  String get validationResult {
+    return _validationResult;
   }
 }
