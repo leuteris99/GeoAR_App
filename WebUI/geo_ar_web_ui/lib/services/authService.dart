@@ -5,8 +5,13 @@ import 'package:geo_ar_web_ui/models/myUser.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  MyUser _user(UserCredential userCredential) {
-    return userCredential != null ? MyUser(uid: userCredential.user.uid) : null;
+  MyUser _user(User user) {
+    return user != null ? MyUser(uid: user.uid) : null;
+  }
+
+  // auth change user stream
+  Stream<MyUser> get user {
+    return _auth.authStateChanges().map(_user);
   }
 
   // sign in with email
@@ -16,7 +21,7 @@ class AuthService {
         email: email,
         password: password,
       );
-      return _user(userCredential);
+      return _user(userCredential.user);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -36,4 +41,12 @@ class AuthService {
   }
 
   // sign out
+  Future signOut() async {
+    try{
+      return await _auth.signOut();
+    }catch(e){
+      print(e.toString());
+      return null;
+    }
+  }
 }
