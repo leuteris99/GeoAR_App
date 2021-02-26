@@ -4,10 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 // Import the Provider package
 import 'package:provider/provider.dart';
-// Import the firestore plugin
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// Import the firebase authentication plugin
-// import 'package:firebase_auth/firebase_auth.dart';
 
 // Project Imports
 import 'models/myUser.dart';
@@ -51,6 +47,7 @@ class MyApp extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
+                canvasColor: Colors.grey[900],
               ),
               home: Wrapper(),
               // routes: <String, WidgetBuilder>{
