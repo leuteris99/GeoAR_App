@@ -103,6 +103,13 @@ class DatabaseService {
         .add(sendingData);
   }
 
+  Future deleteDocument(String selectedDocument) {
+    return _firebaseFirestore
+        .doc(selectedDocument)
+        .delete()
+        .catchError((error) => print("Failed to delete document: $error"));
+  }
+
   dynamic selectFile() async {
     final result = await FilePicker.platform
         .pickFiles(type: FileType.any, allowMultiple: false);

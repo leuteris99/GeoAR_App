@@ -4,7 +4,7 @@ import 'package:geo_ar_web_ui/models/ArModel.dart';
 import 'package:geo_ar_web_ui/models/Hologram.dart';
 import 'package:geo_ar_web_ui/models/MyRoute.dart';
 import 'package:geo_ar_web_ui/models/Place.dart';
-import 'package:geo_ar_web_ui/screen/dialogs/showItemDialog.dart';
+import 'package:geo_ar_web_ui/screen/dialogs/onAddButtonClick.dart';
 import 'package:geo_ar_web_ui/services/authService.dart';
 import 'package:geo_ar_web_ui/services/databaseService.dart';
 
@@ -83,8 +83,10 @@ class _HomePageState extends State<HomePage> {
         snapshot.data.docChanges.forEach((docChange) {
           // add new item when an object gets added and remove an item when a object get deleted.
           if (docChange.type == DocumentChangeType.added) {
-            textViewList.insert(docChange.newIndex + 2,
-                makeItem(docChange.doc["title"], context));
+            textViewList.insert(
+                docChange.newIndex + 2,
+                makeItem(
+                    docChange.doc["title"], docChange.doc.reference, context));
             if (collectionName == "routes") {
               print(docChange.doc["title"]);
 
@@ -163,7 +165,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget makeItem(String name, var context) {
+  Widget makeItem(String name, DocumentReference reference, var context) {
     return Container(
       height: 55,
       width: (getScreenWidth(context) / 5.0) - 20,
@@ -186,6 +188,15 @@ class _HomePageState extends State<HomePage> {
             title: Text(
               name,
               style: TextStyle(color: Colors.white),
+            ),
+            trailing: IconButton(
+              icon: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                DatabaseService().deleteDocument(reference.path);
+              },
             ),
           ),
         ),

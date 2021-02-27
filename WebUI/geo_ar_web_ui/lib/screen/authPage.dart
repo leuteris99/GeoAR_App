@@ -59,7 +59,9 @@ class _AuthPageState extends State<AuthPage> {
                             return "Please enter your email.";
                           } else {
                             String tmp = as.validationResult;
-                            if (tmp == "No user found for that email." || tmp == "The email address is badly formatted.") {
+                            if (tmp == "No user found for that email." ||
+                                tmp ==
+                                    "The email address is badly formatted.") {
                               return tmp;
                             }
                           }
@@ -97,7 +99,8 @@ class _AuthPageState extends State<AuthPage> {
                             return "Please enter your password.";
                           } else {
                             String tmp = as.validationResult;
-                            if (tmp == "Wrong password provided for that user.") {
+                            if (tmp ==
+                                "Wrong password provided for that user.") {
                               return tmp;
                             }
                           }
@@ -140,12 +143,13 @@ class _AuthPageState extends State<AuthPage> {
                   color: Colors.white,
                 ),
                 onPressed: () async {
-                  _formKey.currentState.validate();
-                  await as.signIn(
-                    emailController.text,
-                    passController.text,
-                    context,
-                  );
+                  if (_formKey.currentState.validate()) {
+                    await as.signIn(
+                      emailController.text,
+                      passController.text,
+                      context,
+                    );
+                  }
                 },
               ),
             ],

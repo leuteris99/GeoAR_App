@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
                 canvasColor: Colors.grey[900],
+                unselectedWidgetColor: Colors.white,
               ),
               home: Wrapper(),
               // routes: <String, WidgetBuilder>{

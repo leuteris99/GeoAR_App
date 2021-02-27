@@ -2,13 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Place {
   String _title;
-  Map<String,dynamic> _latLng;
+  DocumentReference _reference;
+  Map<String, dynamic> _latLng;
   int _aoe;
   DocumentReference _hologramReference;
 
-  Place(String title, Map<String,dynamic> coordinates, int aoe,
-      DocumentReference hologramReference) {
+  Place(String title, Map<String, dynamic> coordinates, int aoe,
+      DocumentReference hologramReference,
+      {DocumentReference reference}) {
     _title = title;
+    this._reference = reference;
     _latLng = coordinates;
     _aoe = aoe;
     _hologramReference = hologramReference;
@@ -17,6 +20,10 @@ class Place {
   String get title => this._title;
 
   set title(String value) => this._title = value;
+
+  DocumentReference get reference => this._reference;
+
+  set reference(DocumentReference value) => this._reference = value;
 
   get latLng => this._latLng;
 
