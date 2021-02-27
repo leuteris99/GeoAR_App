@@ -62,19 +62,19 @@ class Hologram {
   @override
   String toString() {
     return "Hologram {" +
-        "\ntitle: " +
+        "\n    title: " +
         title.toString() +
-        "\nimageURl: " +
+        ",\n    imageURl: " +
         imageURL.toString() +
-        "\ndescription: " +
+        ",\n    description: " +
         description.toString() +
-        "\nquestion: " +
+        ",\n    question: " +
         question.toString() +
-        "\nanswerArray: " +
+        ",\n    answerArray: " +
         answerArray.toString() +
-        "\nwebURL: " +
+        ",\n    webURL: " +
         webURL.toString() +
-        "\narModelReference: " +
+        ",\n    arModelReference: " +
         arModelReference.toString() +
         "\n}";
   }

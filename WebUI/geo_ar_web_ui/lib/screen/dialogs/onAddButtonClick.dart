@@ -114,7 +114,7 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
           controller: _inputControllers[controllerCount++]));
       widgetList.add(Padding(
         padding: const EdgeInsets.only(top: 30),
-        child: getEditText("Area of Effect", (String value) {
+        child: getEditText("Area of Effect (default: 10)", (String value) {
           if (value.isNotEmpty) {
             int tmp = int.tryParse(value);
             if (tmp <= 0) {
@@ -227,7 +227,7 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
       widgetList.add(getDropDown());
     } else if (_categoryTitle == "Models") {
       widgetList.add(
-        getEditText("Scale", (String value) {
+        getEditText("Scale (default: 1)", (String value) {
           if (value.isNotEmpty || value != "") {
             return double.tryParse(value) != null
                 ? null
@@ -239,7 +239,7 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
             controller: _inputControllers[controllerCount++]),
       );
       widgetList.add(
-        getEditText("Distance from the Center", (String value) {
+        getEditText("Distance from the Center (default: 0)", (String value) {
           if (value.isNotEmpty || value != "") {
             return double.tryParse(value) != null
                 ? null
@@ -252,7 +252,7 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
       );
       widgetList.add(
         getEditText(
-          "Animation Speed",
+          "Animation Speed (default: 10.000)",
           (String value) {
             if (value.isNotEmpty || value != "") {
               return num.tryParse(value) != null
@@ -294,7 +294,6 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
           ),
           onPressed: () async {
             var tmp = await DatabaseService().selectFile();
-            print("file selected");
 
             setState(() {
               _fileResult = tmp;
@@ -314,8 +313,6 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
         actions: [
           new TextButton(
             onPressed: () {
-              //TODO: Handle save.
-              print("get saved!");
               var data;
               switch (_categoryTitle) {
                 case "Routes":
@@ -377,17 +374,17 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
                   break;
                 case "Models":
                   if (_formKey.currentState.validate()) {
-                    double scale = 10;
+                    double scale = 1;
                     if (_inputControllers[1].text != "" &&
                         _inputControllers[1].text != null) {
                       scale = double.parse(_inputControllers[1].text);
                     }
-                    double distFromAnchor = 10;
+                    double distFromAnchor = 0;
                     if (_inputControllers[2].text != "" &&
                         _inputControllers[2].text != null) {
                       distFromAnchor = double.parse(_inputControllers[2].text);
                     }
-                    num animationSpeed = 10;
+                    num animationSpeed = 10000;
                     if (_inputControllers[3].text != "" &&
                         _inputControllers[3].text != null) {
                       animationSpeed = num.parse(_inputControllers[3].text);
@@ -407,14 +404,12 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
                   }
                   break;
               }
-              print("checks: " + _val.toString());
-              print(data);
 
               if (_fileResult != null) {
                 DatabaseService().uploadFile("ar_models", _fileResult);
               }
               if (_formKey.currentState.validate()) {
-                Navigator.of(context).pop("I am saved YEAH!");
+                Navigator.of(context).pop("Item saved.");
               }
             },
             child: Text(
@@ -482,7 +477,6 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
       onChanged: (v) {
         setState(() {
           _val[index] = !_val[index];
-          print("object");
         });
       },
       title: Text(

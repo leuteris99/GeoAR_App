@@ -47,17 +47,17 @@ class ArModel {
   @override
   String toString() {
     return "ArModel {" +
-        "\ntitle: " +
+        "\n   title: " +
         title +
-        "\nreference: " +
+        ",\n   reference: " +
         reference.toString() +
-        "\nmodelURL: " +
+        ",\n   modelURL: " +
         modelURL +
-        "\nscale: " +
+        ",\n   scale: " +
         scale.toString() +
-        "\ndistFromAnchor: " +
+        ",\n   distFromAnchor: " +
         distFromAnchor.toString() +
-        "\nanimationSpeed: " +
+        ",\n   animationSpeed: " +
         animationSpeed.toString() +
         "\n}";
   }

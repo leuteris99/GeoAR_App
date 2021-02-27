@@ -40,15 +40,15 @@ class Place {
   @override
   String toString() {
     return "Place {" +
-        "\ntitle: " +
+        "\n   title: " +
         title +
-        "\nlatLng: {\n\tlatitude:" +
+        ",\n   latLng: {\n        latitude: " +
         latLng["latitude"].toString() +
-        ",\n\tlongitude: " +
+        ",\n        longitude: " +
         latLng["longitude"].toString() +
-        ",\n}\naoe: " +
+        ",\n    }\n    aoe: " +
         aoe.toString() +
-        "\nhologramReference: " +
+        ",\n    hologramReference: " +
         hologramReference.toString() +
         "\n}";
   }

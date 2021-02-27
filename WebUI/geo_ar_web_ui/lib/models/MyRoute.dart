@@ -25,9 +25,9 @@ class MyRoute {
   @override
   String toString() {
     return "Route {" +
-        "\ntitle: " +
+        "\n   title: " +
         title +
-        "\nplaces: " +
+        ",\n   places: " +
         places.toString() +
         "\n}";
   }

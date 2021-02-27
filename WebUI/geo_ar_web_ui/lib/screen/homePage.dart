@@ -83,58 +83,68 @@ class _HomePageState extends State<HomePage> {
         snapshot.data.docChanges.forEach((docChange) {
           // add new item when an object gets added and remove an item when a object get deleted.
           if (docChange.type == DocumentChangeType.added) {
-            textViewList.insert(
-                docChange.newIndex + 2,
-                makeItem(
-                    docChange.doc["title"], docChange.doc.reference, context));
+            dynamic item;
             if (collectionName == "routes") {
-              print(docChange.doc["title"]);
+              // print(docChange.doc["title"]);
 
-              routes.insert(docChange.newIndex,
-                  MyRoute(docChange.doc["title"], docChange.doc["places"]));
+              item = MyRoute(
+                docChange.doc["title"],
+                docChange.doc["places"],
+                reference: docChange.doc.reference,
+              );
+              routes.insert(docChange.newIndex, item);
             } else if (collectionName == "marker") {
               Map<String, dynamic> latLngMap = {
                 "latitude": docChange.doc["latLng"]["latitude"],
                 "longitude": docChange.doc["latLng"]["longitude"],
               };
+
+              item = Place(
+                docChange.doc["title"],
+                latLngMap,
+                docChange.doc["aoe"],
+                docChange.doc["hologramReference"],
+                reference: docChange.doc.reference,
+              );
               places.insert(
                 docChange.newIndex,
-                Place(
-                  docChange.doc["title"],
-                  latLngMap,
-                  docChange.doc["aoe"],
-                  docChange.doc["hologramReference"],
-                ),
+                item,
               );
             } else if (collectionName == "hologram") {
+              item = Hologram(
+                docChange.doc["title"],
+                docChange.doc["description"],
+                reference: docChange.doc.reference,
+                question: docChange.doc["question"],
+                answerArray: docChange.doc["answerArray"],
+                arModelReference: docChange.doc["arModelReference"],
+                imageUrl: docChange.doc["imageURL"],
+                webURL: docChange.doc["webURL"],
+              );
               holograms.insert(
                 docChange.newIndex,
-                Hologram(
-                  docChange.doc["title"],
-                  docChange.doc["description"],
-                  reference: docChange.doc.reference,
-                  question: docChange.doc["question"],
-                  answerArray: docChange.doc["answerArray"],
-                  arModelReference: docChange.doc["arModelReference"],
-                  imageUrl: docChange.doc["imageURL"],
-                  webURL: docChange.doc["webURL"],
-                ),
+                item,
               );
             } else if (collectionName == "arModel") {
+              item = ArModel(
+                docChange.doc["title"],
+                docChange.doc["modelURL"],
+                reference: docChange.doc.reference,
+                scale: docChange.doc["scale"],
+                distFromAnchor: docChange.doc["distFromAnchor"],
+                animationSpeed: docChange.doc["animationSpeed"],
+              );
               arModels.insert(
                 docChange.newIndex,
-                ArModel(
-                  docChange.doc["title"],
-                  docChange.doc["modelURL"],
-                  reference: docChange.doc.reference,
-                  scale: docChange.doc["scale"],
-                  distFromAnchor: docChange.doc["distFromAnchor"],
-                  animationSpeed: docChange.doc["animationSpeed"],
-                ),
+                item,
               );
             }
+
+            textViewList.insert(
+              docChange.newIndex + 2,
+              makeItem(item, context),
+            );
           } else if (docChange.type == DocumentChangeType.removed) {
-            print("doc remove");
             textViewList.removeAt(docChange.oldIndex + 2);
             if (collectionName == "routes") {
               routes.removeAt(docChange.oldIndex);
@@ -165,7 +175,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget makeItem(String name, DocumentReference reference, var context) {
+  Widget makeItem(dynamic item, var context) {
     return Container(
       height: 55,
       width: (getScreenWidth(context) / 5.0) - 20,
@@ -177,16 +187,17 @@ class _HomePageState extends State<HomePage> {
           customBorder:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
+            /* ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(name),
+                content: Text(item.title),
                 duration: const Duration(milliseconds: 500),
               ),
-            );
+            ); */
+            _execShowItemInfoDialog(item);
           },
           child: ListTile(
             title: Text(
-              name,
+              item.title,
               style: TextStyle(color: Colors.white),
             ),
             trailing: IconButton(
@@ -195,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
               ),
               onPressed: () {
-                DatabaseService().deleteDocument(reference.path);
+                DatabaseService().deleteDocument(item.reference.path);
               },
             ),
           ),
@@ -235,13 +246,13 @@ class _HomePageState extends State<HomePage> {
         ),
         onPressed: () async {
           if (category == "Routes") {
-            _execShowItemDialog(context, places, category);
+            _execShowAddItemDialog(context, places, category);
           } else if (category == "Places") {
-            _execShowItemDialog(context, holograms, category);
+            _execShowAddItemDialog(context, holograms, category);
           } else if (category == "Holograms") {
-            _execShowItemDialog(context, arModels, category);
+            _execShowAddItemDialog(context, arModels, category);
           } else if (category == "Models") {
-            _execShowItemDialog(context,
+            _execShowAddItemDialog(context,
                 await DatabaseService().getStorageList("ar_models"), category);
           }
         },
@@ -257,7 +268,7 @@ class _HomePageState extends State<HomePage> {
     return MediaQuery.of(context).size.height;
   }
 
-  void _execShowItemDialog(
+  void _execShowAddItemDialog(
       var context, List items, String categoryTitle) async {
     String save = await Navigator.of(context).push(
       new MaterialPageRoute<String>(
@@ -279,5 +290,29 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
+  }
+
+  void _execShowItemInfoDialog(dynamic item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text(
+            item.title,
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          children: [
+            SimpleDialogOption(
+              child: Text(
+                item.toString(),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
