@@ -93,94 +93,96 @@ public class MapFragment extends Fragment implements
         @Override
         public void run() {
             Log.d(TAG, "run: thread processing");
-
-            for (Place place : places) {
-                getDeviceLocation(false);
-                double distance = Math.sqrt(Math.pow((place.getLatLng().latitude - mUserPosition.latitude), 2) + Math.pow((place.getLatLng().longitude - mUserPosition.longitude), 2));
+            try {
+                for (Place place : places) {
+                    getDeviceLocation(false);
+                    double distance = Math.sqrt(Math.pow((place.getLatLng().latitude - mUserPosition.latitude), 2) + Math.pow((place.getLatLng().longitude - mUserPosition.longitude), 2));
 //                Log.d(TAG, "getNearbyPlace: distance : "+ distance);
-                if (distance <= (place.getAOE() * 0.00001)) {
-                    db.document(place
-                            .getHologramReference()
-                            .getPath())
-                            .get()
-                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    Map<String, Object> map = documentSnapshot.getData();
+                    if (distance <= (place.getAOE() * 0.00001)) {
+                        db.document(place
+                                .getHologramReference()
+                                .getPath())
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        Map<String, Object> map = documentSnapshot.getData();
 
-                                    ArrayList<String> qArray = new ArrayList<>();
-                                    qArray.add((String) map.get("question"));
-                                    ArrayList<String> tmpAnswers = (ArrayList<String>) map.get("answerArray");
-                                    qArray.addAll(tmpAnswers);
+                                        ArrayList<String> qArray = new ArrayList<>();
+                                        qArray.add((String) map.get("question"));
+                                        ArrayList<String> tmpAnswers = (ArrayList<String>) map.get("answerArray");
+                                        qArray.addAll(tmpAnswers);
 
-                                    Hologram hologram = null;
-                                    if (map.get("arModelReference") instanceof String) {
-                                        hologram = new Hologram(
-                                                (String) map.get("title"),
-                                                (String) map.get("imageURL"),
-                                                (String) map.get("description"),
-                                                (ArrayList<String>) qArray,
-                                                (String) map.get("webURL"),
-                                                null
-                                        );
-                                    } else if (map.get("arModelReference") instanceof DocumentReference) {
-                                        hologram = new Hologram(
-                                                (String) map.get("title"),
-                                                (String) map.get("imageURL"),
-                                                (String) map.get("description"),
-                                                (ArrayList<String>) qArray,
-                                                (String) map.get("webURL"),
-                                                (DocumentReference) map.get("arModelReference")
-                                        );
-                                    }
+                                        Hologram hologram = null;
+                                        if (map.get("arModelReference") instanceof String) {
+                                            hologram = new Hologram(
+                                                    (String) map.get("title"),
+                                                    (String) map.get("imageURL"),
+                                                    (String) map.get("description"),
+                                                    (ArrayList<String>) qArray,
+                                                    (String) map.get("webURL"),
+                                                    null
+                                            );
+                                        } else if (map.get("arModelReference") instanceof DocumentReference) {
+                                            hologram = new Hologram(
+                                                    (String) map.get("title"),
+                                                    (String) map.get("imageURL"),
+                                                    (String) map.get("description"),
+                                                    (ArrayList<String>) qArray,
+                                                    (String) map.get("webURL"),
+                                                    (DocumentReference) map.get("arModelReference")
+                                            );
+                                        }
 
 
-                                    if (hologram.getArModel() != null) {
-                                        Hologram finalHologram = hologram;
-                                        db.document(hologram.getArModel().getPath()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                Map<String, Object> arModelData = documentSnapshot.getData();
+                                        if (hologram.getArModel() != null) {
+                                            Hologram finalHologram = hologram;
+                                            db.document(hologram.getArModel().getPath()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    Map<String, Object> arModelData = documentSnapshot.getData();
 
-                                                float tmpScale;
-                                                float tmpDistFromAnchor;
-                                                if (arModelData.get("scale") instanceof Long) {
-                                                    tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
-                                                } else {
-                                                    tmpScale = (float) ((Double) arModelData.get("scale")).floatValue();
+                                                    float tmpScale;
+                                                    float tmpDistFromAnchor;
+                                                    if (arModelData.get("scale") instanceof Long) {
+                                                        tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
+                                                    } else {
+                                                        tmpScale = (float) ((Double) arModelData.get("scale")).floatValue();
+                                                    }
+                                                    if (arModelData.get("distFromAnchor") instanceof Long) {
+                                                        tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
+                                                    } else {
+                                                        tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
+                                                    }
+
+                                                    ArModel arModel = new ArModel(
+                                                            (String) arModelData.get("title"),
+                                                            (String) arModelData.get("modelURL"),
+                                                            (float) tmpScale,
+                                                            (float) tmpDistFromAnchor,
+                                                            (int) ((Long) arModelData.get("animationSpeed")).intValue());
+
+                                                    listener.onMapDataTransfer(place, finalHologram, arModel);
+                                                    isCurrentPlaceSelected = true;
                                                 }
-                                                if (arModelData.get("distFromAnchor") instanceof Long) {
-                                                    tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
-                                                } else {
-                                                    tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
-                                                }
+                                            });
+                                        } else {
+                                            listener.onMapDataTransfer(place, hologram, null);
+                                            isCurrentPlaceSelected = true;
+                                        }
 
-                                                ArModel arModel = new ArModel(
-                                                        (String) arModelData.get("title"),
-                                                        (String) arModelData.get("modelURL"),
-                                                        (float) tmpScale,
-                                                        (float) tmpDistFromAnchor,
-                                                        (int) ((Long) arModelData.get("animationSpeed")).intValue());
-
-                                                listener.onMapDataTransfer(place, finalHologram, arModel);
-                                                isCurrentPlaceSelected = true;
-                                            }
-                                        });
-                                    } else {
-                                        listener.onMapDataTransfer(place, hologram, null);
-                                        isCurrentPlaceSelected = true;
                                     }
+                                });
 
-                                }
-                            });
-
-                    break;
-                } else {//if (isCurrentPlaceSelected)
+                        break;
+                    } else {//if (isCurrentPlaceSelected)
 //                    isCurrentPlaceSelected = false;
-                    listener.gettingAwayFromPlaces();
+                        listener.gettingAwayFromPlaces();
+                    }
                 }
+            } catch (Exception e) {
+                Log.d(TAG, "run: Error: nullifying thread.");
             }
-
             timerHandler.postDelayed(this, 10000);
         }
     };
@@ -229,12 +231,18 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         timerHandler.removeCallbacks(timerRunnable);
         Log.d(TAG, "run: onDetach: finishing");
 
-        super.onDetach();
-
         listener = null;
+        db.terminate();
+        db.clearPersistence();
     }
 
     private void initMap() {

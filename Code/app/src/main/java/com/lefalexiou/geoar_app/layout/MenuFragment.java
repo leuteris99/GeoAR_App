@@ -126,7 +126,7 @@ public class MenuFragment extends Fragment {
         return v;
     }
 
-    public  interface MenuFragmentListener{
+    public interface MenuFragmentListener {
         void onMenuDataTransfer(Route route);
     }
 
@@ -134,11 +134,11 @@ public class MenuFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        if (context instanceof MenuFragmentListener){
+        if (context instanceof MenuFragmentListener) {
             listener = (MenuFragmentListener) context;
-        }else {
+        } else {
             throw new RuntimeException(context.toString()
-            + " must implement MenuFragmentListener");
+                    + " must implement MenuFragmentListener");
         }
     }
 
@@ -159,6 +159,8 @@ public class MenuFragment extends Fragment {
         super.onDetach();
 
         listener = null;
+        db.terminate();
+        db.clearPersistence();
     }
 
     public void addData(Route route) {

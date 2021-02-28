@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:22.1.0'
     implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
     implementation 'com.google.firebase:firebase-storage:19.2.1'
+    // Add dependency for firebase authentication service
+    implementation 'com.google.firebase:firebase-auth'
     // firebase analytics dependency
     implementation 'com.google.firebase:firebase-analytics:18.0.2'
     testImplementation 'junit:junit:4.12'
