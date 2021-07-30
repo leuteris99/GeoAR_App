@@ -479,9 +479,28 @@ class _OnAddButtonClickState extends State<OnAddButtonClick> {
           _val[index] = !_val[index];
         });
       },
-      title: Text(
-        object.title,
-        style: TextStyle(color: Colors.white),
+      title: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.arrow_upward,
+              color: Colors.white,
+            ),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_downward,
+              color: Colors.white,
+            ),
+            onPressed: () {},
+          ),
+          Text(
+            object.title,
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
       ),
     );
   }

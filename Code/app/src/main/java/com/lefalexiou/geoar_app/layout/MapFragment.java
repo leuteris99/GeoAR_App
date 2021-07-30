@@ -208,7 +208,6 @@ public class MapFragment extends Fragment implements
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         initMap();
-//        fab = (FloatingActionButton) v.findViewById(R.id.fab); TODO: to remove
         nextButton = (Button) v.findViewById(R.id.next_bt);
         prevButton = (Button) v.findViewById(R.id.prev_bt);
 
@@ -334,8 +333,7 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    private void addMarkers(ArrayList<Place> placeArrayList) {//List<Place> placesList
-        // TODO: Reset the markers. On live add this when you change all your markers.
+    private void addMarkers(ArrayList<Place> placeArrayList) {
         Log.d(TAG, "addMarker: add marker");
         resetMap();
         for (Place place : placeArrayList) {
@@ -449,39 +447,6 @@ public class MapFragment extends Fragment implements
         //getting device position and displaying it on the map
         getDeviceLocation(true);
 
-        //TODO: remove that only for testing
-        /*addData(new Place(
-                new LatLng(37.971774741979004, 23.72580165163131),
-                "Acropolis of Athens",
-                50,
-                "https://lp-cms-production.imgix.net/2019-06/b3d692e130903b3693711c7b3b1d2a3d887403c4c9ab747773647864e71a51f4.jpg",
-                "This is acropolis of athens",
-                new ArrayList<>(), ""));
-        addData(new Place(
-                new LatLng(37.9647036, 23.7312254),
-                "Temple of Olympian Zeus",
-                40,
-                "https://upload.wikimedia.org/wikipedia/commons/b/b0/Attica_06-13_Athens_25_Olympian_Zeus_Temple.jpg",
-                "This is the temple of the olympian zeus in athens",
-                new ArrayList<>(),
-                ""));
-        addData(new Place(
-                new LatLng(37.96836337537587, 23.7061584792439),
-                "Home",
-                30,
-                "",
-                "That's my home",
-                new ArrayList<>(),
-                ""));
-        addData(new Place(
-                new LatLng(37.9665086, 23.7081846),
-                "Best",
-                20,
-                "https://s3-eu-west-1.amazonaws.com/static.myjobnow.com/photos/RackMultipart20191121-2151-syopak.png",
-                "",
-                new ArrayList<>(),
-                "https://besttaste.gr/"));*/
-
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onMapReady: permission deny");
             return;
@@ -492,12 +457,7 @@ public class MapFragment extends Fragment implements
         //TODO: Testing marker remove it on live
         askData(true);
 
-        /*fab.setOnClickListener(new View.OnClickListener() { TODO: to remove
-            @Override
-            public void onClick(View view) {
-                calculateDirections(markersList.get(0));
-            }
-        });*/
+
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -527,40 +487,9 @@ public class MapFragment extends Fragment implements
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 Map<String, Object> data = document.getData();
                                 Map<String, Object> geoData = (Map<String, Object>) data.get("latLng");
-//                                Map<String, Object> holoData = (Map<String, Object>) data.get("hologram");
-
-                                /*ArrayList<String> qArray = new ArrayList<>();
-                                qArray.add((String) holoData.get("question"));
-                                ArrayList<String> tmpAnswers = (ArrayList<String>) holoData.get("answerArray");
-                                qArray.addAll(tmpAnswers);*/
 
                                 LatLng latLng = new LatLng((double) geoData.get("latitude"), (double) geoData.get("longitude"));
 
-                                /*float tmpScale;
-                                float tmpDistFromAnchor;
-                                if (arModelData.get("scale") instanceof Long) {
-                                    tmpScale = (float) ((Long) arModelData.get("scale")).floatValue();
-                                } else {
-                                    tmpScale = (float) ((Double) arModelData.get("scale")).floatValue();
-                                }
-                                if (arModelData.get("distFromAnchor") instanceof Long) {
-                                    tmpDistFromAnchor = (float) ((Long) arModelData.get("distFromAnchor")).floatValue();
-                                } else {
-                                    tmpDistFromAnchor = (float) ((Double) arModelData.get("distFromAnchor")).floatValue();
-                                }*/
-                                /*ArModel arModel = new ArModel(
-                                        (String) arModelData.get("title"),
-                                        (String) arModelData.get("modelURL"),
-                                        (float) tmpScale,
-                                        (float) tmpDistFromAnchor,
-                                        (int) ((Long)arModelData.get("animationSpeed")).intValue());
-                                Hologram hologram = new Hologram(
-                                        (String) holoData.get("title"),
-                                        (String) holoData.get("imageURL"),
-                                        (String) holoData.get("description"),
-                                        qArray,
-                                        (String) holoData.get("webURL"),
-                                        arModel);*/
                                 Place place = new Place(latLng, (String) data.get("title"), (long) data.get("aoe"), (DocumentReference) data.get("hologramReference"));
 //                                Log.d(TAG, "onMap: place: " + place);
 

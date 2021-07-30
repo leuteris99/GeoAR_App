@@ -31,10 +31,10 @@ import java.util.ArrayList;
  */
 public class MenuFragment extends Fragment {
     private static final String TAG = "MenuFragment";
-    private RecyclerView recyclerView;
-    private RoutesListAdapter routesListAdapter;
+//    private RecyclerView recyclerView;
+//    private RoutesListAdapter routesListAdapter;
     private RoutesRecyclerAdapter routesRecyclerAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+//    private RecyclerView.LayoutManager layoutManager;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<Route> routes = new ArrayList<>();
     private MenuFragmentListener listener;
@@ -52,55 +52,17 @@ public class MenuFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initDataSet();
         Log.d(TAG, "RoutesListAdapter: onCreate: " + routes);
     }
 
-    private void initDataSet() {
-/*        ArrayList<String> toadd = new ArrayList<>();
-        toadd.add("Acropolis of Athens");
-        toadd.add("Temple of Olympian Zeus");
-        addData(new Route("Central Athens Tour",toadd));*/
-        Log.d(TAG, "initDataSet: pre-db");
-//        db.collection("routes")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        routes.clear();
-//                        Log.d(TAG, "initDataSet: onComplete: onComplete start");
-//                        for (QueryDocumentSnapshot document: task.getResult()){
-//                            Map<String,Object> data = document.getData();
-//                            ArrayList<String> placesData = new ArrayList<>();
-//                            placesData.addAll(0,(ArrayList)data.get("places"));
-//                            Route route = new Route((String) data.get("title"),placesData);
-//                            routes.add(route);
-//                        }
-//                        Log.d(TAG, "initDataSet: onComplete: routeData: " + routes);
-////                        routesListAdapter.notifyItemRangeInserted(0,routes.size());
-//                        routesListAdapter.notifyDataSetChanged();
-//                    }
-//                });
-//        Log.d(TAG, "initDataSet: route: " + routes);
-        //TODO: Change dat thing to the firebase recycler (maybe also change and the pagination to firebase)
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        initDataSet();
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_menu, container, false);
 
-        /*recyclerView = (RecyclerView) v.findViewById(R.id.routes_recycler_view);
-        layoutManager = new LinearLayoutManager(getActivity());
-
-        recyclerView.setLayoutManager(layoutManager);
-
-
-        Log.d(TAG, "RoutesListAdapter: onfragment: "+ routes);
-        routesListAdapter = new RoutesListAdapter(routes);
-        recyclerView.setAdapter(routesListAdapter);*/
         Query query = db.collection("routes");
 
         FirestoreRecyclerOptions<Route> options = new FirestoreRecyclerOptions.Builder<Route>()
@@ -155,16 +117,11 @@ public class MenuFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroy() {
+        super.onDestroy();
 
         listener = null;
         db.terminate();
         db.clearPersistence();
-    }
-
-    public void addData(Route route) {
-        db.collection("routes")
-                .add(route);
     }
 }
