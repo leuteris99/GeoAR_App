@@ -25,49 +25,4 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
-
-    <!--<fragment
-        android:id="@+id/fragment"
-        android:name="com.google.ar.sceneform.ux.ArFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/radio" />
-
-    <RadioGroup
-        android:id="@+id/radio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/parent">
-
-        <RadioButton
-            android:id="@+id/radio_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
-            android:text="View" />
-
-        <RadioButton
-            android:id="@+id/video"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
-            android:text="video model" />
-
-        <RadioButton
-            android:id="@+id/model"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
-            android:text="3D model" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/animated_model"
-            android:text="animated model"
-            android:onClick="onRadioButtonClicked"/>
-    </RadioGroup>-->
-
 </RelativeLayout>

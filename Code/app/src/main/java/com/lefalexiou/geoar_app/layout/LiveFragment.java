@@ -39,10 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class LiveFragment extends Fragment implements View.OnClickListener {
+public class LiveFragment extends Fragment  {
     private static final String TAG = "LiveFragment";
     private ArFragment arFragment;
-    private int itemSelector;
     private String answer;
     private Context context;
     private TextView currentPlaceTextView;
@@ -63,18 +62,6 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
         arFragment = (ArFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
-        RadioButton viewButton = v.findViewById(R.id.radio_view);
-        viewButton.setOnClickListener(this);
-
-        viewButton.setChecked(true);
-        itemSelector = 0;
-
-        RadioButton video = v.findViewById(R.id.video);
-        video.setOnClickListener(this);
-        RadioButton model = v.findViewById(R.id.model);
-        model.setOnClickListener(this);
-        RadioButton animatedModel = v.findViewById(R.id.animated_model);
-        animatedModel.setOnClickListener(this);
 
         currentPlaceTextView = v.findViewById(R.id.current_place_text_view);
         gettingAwayFromPlaces();
@@ -141,34 +128,6 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.radio_view:
-                if (checked)
-                    // View selected
-                    itemSelector = 0;
-                break;
-            case R.id.video:
-                if (checked)
-                    // Video model selected
-                    itemSelector = 1;
-                break;
-            case R.id.model:
-                if (checked)
-                    // 3d transformable model selected
-                    itemSelector = 2;
-                break;
-            case R.id.animated_model:
-                if (checked)
-                    // animated model selected
-                    itemSelector = 3;
-        }
-    }
-
     public void onSubmitClick(View view) {
         Button b = (Button) view;
         b.setText(answer);
@@ -189,11 +148,6 @@ public class LiveFragment extends Fragment implements View.OnClickListener {
                     answer = "second it is!";
                 break;
         }
-    }
-
-    @Override
-    public void onClick(View view) {
-        onRadioButtonClicked(view);
     }
 
     private void clearTheARScene() {
